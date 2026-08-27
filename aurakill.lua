@@ -1,104 +1,90 @@
--- Dead Rails Kill Aura Hub (Always Visible - Delta Optimized)
+-- ==============================================================================
+-- DEAD RAILS | KILL AURA MENU (BẢN ĐẦU TIÊN TỪ GITHUB)
+-- ==============================================================================
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+
+-- Xóa menu cũ nếu đã tồn tại để tránh bị trùng
+if CoreGui:FindFirstChild("FirstGithubKillAura") then
+    CoreGui.FirstGithubKillAura:Destroy()
+end
+
+-- Tạo GUI cơ bản giống hệt bản đầu tiên
 local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local UIListLayout = Instance.new("UIListLayout")
-local TopBar = Instance.new("Frame")
-local TitleLabel = Instance.new("TextLabel")
-local StatusLabel = Instance.new("TextLabel")
-local KillAuraBtn = Instance.new("TextButton")
+ScreenGui.Name = "FirstGithubKillAura"
+ScreenGui.Parent = CoreGui
 
-ScreenGui.Name = "KillAuraHub"
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ResetOnSpawn = false
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -75)
+Frame.Size = UDim2.new(0, 250, 0, 110)
+Frame.Active = true
+Frame.Draggable = true
 
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
-MainFrame.Size = UDim2.new(0, 160, 0, 95)
-MainFrame.Visible = true
-MainFrame.Active = true
-MainFrame.Draggable = true
+local Title = Instance.new("TextLabel")
+Title.Parent = Frame
+Title.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "DEAD RAILS - KILL AURA"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 14
 
-TopBar.Name = "TopBar"
-TopBar.Parent = MainFrame
-TopBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(0, 160, 0, 26)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Parent = Frame
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+ToggleBtn.Position = UDim2.new(0, 10, 0, 40)
+ToggleBtn.Size = UDim2.new(1, -20, 0, 30)
+ToggleBtn.Text = "Kill Aura: TẮT"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.TextSize = 13
 
-TitleLabel.Name = "TitleLabel"
-TitleLabel.Parent = TopBar
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 8, 0, 0)
-TitleLabel.Size = UDim2.new(0, 144, 0, 26)
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.Text = "Dead Rails Kill Aura"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 13
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = Frame
+CloseBtn.BackgroundColor3 = Color3.fromRGB(100, 30, 30)
+CloseBtn.Position = UDim2.new(0, 10, 0, 75)
+CloseBtn.Size = UDim2.new(1, -20, 0, 25)
+CloseBtn.Text = "Đóng Menu"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.SourceSansBold
+CloseBtn.TextSize = 12
 
-UIListLayout.Parent = MainFrame
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 4)
-
-StatusLabel.Parent = MainFrame
-StatusLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-StatusLabel.BorderSizePixel = 0
-StatusLabel.Size = UDim2.new(0, 160, 0, 26)
-StatusLabel.Font = Enum.Font.SourceSans
-StatusLabel.Text = "Trạng thái: Tắt"
-StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-StatusLabel.TextSize = 13
-
-KillAuraBtn.Parent = MainFrame
-KillAuraBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-KillAuraBtn.BorderSizePixel = 0
-KillAuraBtn.Size = UDim2.new(0, 160, 0, 32)
-KillAuraBtn.Font = Enum.Font.SourceSansBold
-KillAuraBtn.Text = "Bật Kill Aura"
-KillAuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-KillAuraBtn.TextSize = 13
-
-local KillAuraActive = false
-
-KillAuraBtn.MouseButton1Click:Connect(function()
-    KillAuraActive = not KillAuraActive
-    if KillAuraActive then
-        KillAuraBtn.Text = "Tắt Kill Aura"
-        KillAuraBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-        StatusLabel.Text = "Trạng thái: Đang bật"
-        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+-- Trạng thái Kill Aura
+local auraState = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    auraState = not auraState
+    if auraState then
+        ToggleBtn.Text = "Kill Aura: BẬT"
+        ToggleBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
     else
-        KillAuraBtn.Text = "Bật Kill Aura"
-        KillAuraBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        StatusLabel.Text = "Trạng thái: Tắt"
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        ToggleBtn.Text = "Kill Aura: TẮT"
+        ToggleBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
     end
 end)
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Workspace = game:GetService("Workspace")
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
 
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if KillAuraActive then
-            pcall(function()
-                if Workspace:FindFirstChild("Enemies") then
-                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
-                        if enemy:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                            if (LocalPlayer.Character.HumanoidRootPart.Position - enemy.HumanoidRootPart.Position).Magnitude < 18 then
-                                local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-                                if tool then
-                                    tool:Activate()
-                                end
-                            end
-                        end
-                    end
+-- Logic Kill Aura gốc chạy ngầm
+RunService.Heartbeat:Connect(function()
+    if not auraState then return end
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        for _, obj in ipairs(Workspace:GetChildren()) do
+            if obj:IsA("Model") and obj ~= char and not Players:GetPlayerFromCharacter(obj) then
+                local humanoid = obj:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    humanoid.Health = 0
                 end
-            end)
+            end
         end
-    end
+    end)
 end)
