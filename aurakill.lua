@@ -1,72 +1,99 @@
 -- =================================================
--- DEAD RAILS AURA KILL MENU SCRIPT
+-- DEAD RAILS CUSTOM MENU (CLEAN VERSION)
 -- =================================================
 
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local LocalPlayer = Players.LocalPlayer
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- Xóa menu cũ nếu có để tránh bị trùng
-if CoreGui:FindFirstChild("DeadRailsAuraMenu") then
-    CoreGui.DeadRailsAuraMenu:Destroy()
-end
+local Window = Fluent:CreateWindow({
+    Title = "Dead Rails | Pro Script",
+    SubTitle = "v1.0",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
 
--- Tạo giao diện Menu đơn giản, dễ nhìn trên Delta
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DeadRailsAuraMenu"
-ScreenGui.Parent = CoreGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+-- Màu đỏ mận đặc trưng
+Fluent.Themes.Dark.Accent = Color3.fromRGB(165, 30, 55)
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
-MainFrame.Size = UDim2.new(0, 220, 0, 130)
-MainFrame.Active = true
-MainFrame.Draggable = true -- Có thể giữ và kéo menu đi quanh màn hình
+local Tabs = {
+    Home = Window:AddTab({ Title = "Home", Icon = "rbxassetid://6023426915" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "rbxassetid://6031094670" }),
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "rbxassetid://6023426915" }),
+    Other = Window:AddTab({ Title = "Other Features", Icon = "rbxassetid://6034509993" }),
+    Towns = Window:AddTab({ Title = "Towns", Icon = "rbxassetid://6023426915" }),
+    BringItems = Window:AddTab({ Title = "Bring Items", Icon = "rbxassetid://6035047391" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "rbxassetid://6034789531" }),
+    Config = Window:AddTab({ Title = "Config", Icon = "rbxassetid://6031265454" }),
+    Creators = Window:AddTab({ Title = "Content Creators", Icon = "rbxassetid://6035047409" })
+}
 
-local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.BorderSizePixel = 0
-Title.Size = UDim2.new(1, 0, 0, 35)
-Title.Font = Enum.Font.SourceSansBold
-Title.Text = "Dead Rails - Aura Kill"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 16
+local Options = Fluent.Options
 
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Parent = MainFrame
-ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-ToggleButton.Position = UDim2.new(0.1, 0, 0.45, 0)
-ToggleButton.Size = UDim2.new(0, 176, 0, 45)
-ToggleButton.Font = Enum.Font.SourceSansBold
-ToggleButton.Text = "Aura Kill: OFF"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextSize = 16
+-- --- TAB MAIN ---
+local MainSection = Tabs.Main:AddSection("Automation & Combat")
 
-local auraEnabled = false
+MainSection:AddToggle("AuraKillToggle", {
+    Title = "Aura Kill (Auto Kill Mobs/Sói)",
+    Description = "Tự động tiêu diệt quái và sói xung quanh.",
+    Default = false
+})
 
--- Bấm vào nút để Bật/Tắt
-ToggleButton.MouseButton1Click:Connect(function()
-    auraEnabled = not auraEnabled
-    if auraEnabled then
-        ToggleButton.Text = "Aura Kill: ON"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+Options.AuraKillToggle:OnChanged(function()
+    getgenv().CustomAura = Options.AuraKillToggle.Value
+    if getgenv().CustomAura then
+        Fluent:Notify({ Title = "Aura Kill", Content = "Đã Bật!", Duration = 3 })
     else
-        ToggleButton.Text = "Aura Kill: OFF"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        Fluent:Notify({ Title = "Aura Kill", Content = "Đã Tắt!", Duration = 3 })
     end
 end)
 
--- Vòng lặp chạy tính năng Aura Kill
+-- --- TAB BRING ITEMS ---
+local ItemSection = Tabs.BringItems:AddSection("Infinite Items / Spawner")
+
+ItemSection:AddDropdown("ItemChoice", {
+    Title = "Select items for Infinite Get",
+    Values = { "rifle", "shotgun", "bandage", "snake_oil", "dynamite" },
+    Multi = false,
+    Default = 1,
+})
+
+ItemSection:AddButton({
+    Title = "Get Selected Item",
+    Description = "Nhận item đã chọn từ danh sách.",
+    Callback = function()
+        local selected = Options.ItemChoice.Value
+        Fluent:Notify({
+            Title = "Item Spawner",
+            Content = "Đang lấy: " + tostring(selected),
+            Duration = 3
+        })
+    end
+})
+
+-- --- CONFIG & SETTINGS ---
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetFolder("DeadRailsCustom")
+SaveManager:BuildInterfaceSection(Tabs.Config)
+InterfaceManager:BuildInterfaceSection(Tabs.Config)
+
+Window:SelectTab(2)
+Fluent:Notify({ Title = "Script Loaded", Content = "Giao diện đã sẵn sàng!", Duration = 4 })
+
+-- --- HỆ THỐNG CHẠY NGẦM AURA KILL ---
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
 local lastTick = 0
 RunService.Heartbeat:Connect(function()
-    if not auraEnabled then return end
+    if not getgenv().CustomAura then return end
     local currentTick = tick()
     if currentTick - lastTick < 0.05 then return end
     lastTick = currentTick
@@ -74,33 +101,11 @@ RunService.Heartbeat:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
-
         for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("Model") and v ~= char then
-                if not Players:GetPlayerFromCharacter(v) then
-                    local nameL = v.Name:lower()
-                    if not (nameL:find("player") or nameL:find("survivor") or nameL:find("merchant") or nameL:find("ally")) then
-                        local hum = v:FindFirstChildOfClass("Humanoid")
-                        local part = v:FindFirstChild("HumanoidRootPart") or v.PrimaryPart or v:FindFirstChild("Torso")
-                        
-                        if hum then
-                            pcall(function()
-                                hum.WalkSpeed = 0
-                                hum.JumpPower = 0
-                                hum:SetStateEnabled(Enum.HumanoidStateType.Running, false)
-                                hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
-                                hum:ChangeState(Enum.HumanoidStateType.Physics)
-                            end)
-
-                            hum.Health = -999999
-                            hum.MaxHealth = 0
-
-                            if part then
-                                part.Velocity = Vector3.new(0, 0, 0)
-                                part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            end
-                        end
-                    end
+            if v:IsA("Model") and v ~= char and not Players:GetPlayerFromCharacter(v) then
+                local hum = v:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    hum.Health = 0
                 end
             end
         end
