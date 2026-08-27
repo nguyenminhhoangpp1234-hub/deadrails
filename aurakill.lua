@@ -1,6 +1,6 @@
--- ==============================================================================
--- DEAD RAILS | DIRECT AURA KILL FIX
--- ==============================================================================
+-- =================================================
+-- DEAD RAILS AURA KILL MENU SCRIPT
+-- =================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -8,67 +8,99 @@ local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
-if CoreGui:FindFirstChild("FixedAuraMenu") then
-    CoreGui.FixedAuraMenu:Destroy()
+-- Xóa menu cũ nếu có để tránh bị trùng
+if CoreGui:FindFirstChild("DeadRailsAuraMenu") then
+    CoreGui.DeadRailsAuraMenu:Destroy()
 end
 
+-- Tạo giao diện Menu đơn giản, dễ nhìn trên Delta
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "FixedAuraMenu"
+ScreenGui.Name = "DeadRailsAuraMenu"
 ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local Frame = Instance.new("Frame")
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.Position = UDim2.new(0.5, -120, 0.5, -70)
-Frame.Size = UDim2.new(0, 240, 0, 110)
-Frame.Active = true
-Frame.Draggable = true
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.Size = UDim2.new(0, 220, 0, 130)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Có thể giữ và kéo menu đi quanh màn hình
 
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Parent = Frame
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-ToggleBtn.Position = UDim2.new(0, 10, 0, 15)
-ToggleBtn.Size = UDim2.new(1, -20, 0, 45)
-ToggleBtn.Text = "Kill Aura: TẮT"
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-ToggleBtn.Font = Enum.Font.SourceSansBold
-ToggleBtn.TextSize = 16
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Dead Rails - Aura Kill"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
 
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Parent = Frame
-CloseBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 30)
-CloseBtn.Position = UDim2.new(0, 10, 0, 70)
-CloseBtn.Size = UDim2.new(1, -20, 0, 30)
-CloseBtn.Text = "Tắt Menu"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.TextSize = 13
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = MainFrame
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleButton.Position = UDim2.new(0.1, 0, 0.45, 0)
+ToggleButton.Size = UDim2.new(0, 176, 0, 45)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "Aura Kill: OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 16
 
-local active = false
-ToggleBtn.MouseButton1Click:Connect(function()
-    active = not active
-    if active then
-        ToggleBtn.Text = "Kill Aura: BẬT"
-        ToggleBtn.TextColor3 = Color3.fromRGB(80, 255, 80)
+local auraEnabled = false
+
+-- Bấm vào nút để Bật/Tắt
+ToggleButton.MouseButton1Click:Connect(function()
+    auraEnabled = not auraEnabled
+    if auraEnabled then
+        ToggleButton.Text = "Aura Kill: ON"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
     else
-        ToggleBtn.Text = "Kill Aura: TẮT"
-        ToggleBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+        ToggleButton.Text = "Aura Kill: OFF"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     end
 end)
 
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
+-- Vòng lặp chạy tính năng Aura Kill
+local lastTick = 0
 RunService.Heartbeat:Connect(function()
-    if not active then return end
+    if not auraEnabled then return end
+    local currentTick = tick()
+    if currentTick - lastTick < 0.05 then return end
+    lastTick = currentTick
+
     pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+
         for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("Humanoid") and v.Parent ~= LocalPlayer.Character then
-                -- Kiểm tra xem có phải quái hay không dựa vào team/character
-                local p = Players:GetPlayerFromCharacter(v.Parent)
-                if not p and v.Health > 0 then
-                    v.Health = 0
+            if v:IsA("Model") and v ~= char then
+                if not Players:GetPlayerFromCharacter(v) then
+                    local nameL = v.Name:lower()
+                    if not (nameL:find("player") or nameL:find("survivor") or nameL:find("merchant") or nameL:find("ally")) then
+                        local hum = v:FindFirstChildOfClass("Humanoid")
+                        local part = v:FindFirstChild("HumanoidRootPart") or v.PrimaryPart or v:FindFirstChild("Torso")
+                        
+                        if hum then
+                            pcall(function()
+                                hum.WalkSpeed = 0
+                                hum.JumpPower = 0
+                                hum:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+                                hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+                                hum:ChangeState(Enum.HumanoidStateType.Physics)
+                            end)
+
+                            hum.Health = -999999
+                            hum.MaxHealth = 0
+
+                            if part then
+                                part.Velocity = Vector3.new(0, 0, 0)
+                                part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            end
+                        end
+                    end
                 end
             end
         end
