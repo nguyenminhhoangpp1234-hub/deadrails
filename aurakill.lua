@@ -1,164 +1,163 @@
+                    -- ==============================================================================
+-- DEAD RAILS | NATIVE MASTER MENU (CLEANED - ORIGINAL FAST AURA KILL)
 -- ==============================================================================
--- DEAD RAILS | MASTER SCRIPT HUB (ULTIMATE OPTIMIZED & EXTREME FPS BOOST)
--- ==============================================================================
 
-local success, WindUI = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
-end)
-
-if not success or not WindUI then
-    warn("❌ Không thể tải WindUI. Kiểm tra lại kết nối hoặc Executor!")
-    return
-end
-
-local Window = WindUI:CreateWindow({
-    Title = "DEAD RAILS | MASTER SCRIPT HUB",
-    Icon = "rbxassetid://6031094670",
-    Author = "Tổng Hợp Cộng Đồng",
-    Folder = "DeadRailsMasterHub",
-    Size = UDim2.fromOffset(580, 460),
-    KeySystem = false,
-    Theme = "Dark"
-})
-
-local Tabs = {
-    Home = Window:Tab({ Title = "Trang Chủ", Icon = "rbxassetid://6023426915" }),
-    Hubs = Window:Tab({ Title = "Tổng Hợp Script", Icon = "rbxassetid://6034509993" }),
-    Tools = Window:Tab({ Title = "Tiện Ích Nhanh", Icon = "rbxassetid://6031094670" }),
-    Config = Window:Tab({ Title = "Cài Đặt", Icon = "rbxassetid://6031265454" }),
-    Creators = Window:Tab({ Title = "Tác Giả", Icon = "rbxassetid://6035047409" })
-}
-
--- 1. Trang Chủ
-Tabs.Home:Paragraph({
-    Title = "Chào mừng đến với Master Script Hub!",
-    Desc = "Hệ thống tổng hợp tính năng mạnh mẽ nhất cho Dead Rails kèm chế độ xóa đồ họa ép buộc siêu mượt 100%."
-})
-
--- 2. Tổng Hợp Script
-Tabs.Hubs:Paragraph({
-    Title = "Kho Script Tổng Hợp Dead Rails",
-    Desc = "Bấm vào các nút dưới đây để kích hoạt các Hub tương ứng."
-})
-
-Tabs.Hubs:Button({
-    Title = "🔥 Tải & Chạy Ringta Hub Dead Rails",
-    Desc = "Kích hoạt toàn bộ tính năng Aura Kill, Auto Bring Item và NoClip.",
-    Callback = function()
-        WindUI:Notify({ Title = "Ringta Hub", Content = "Đang khởi chạy Ringta Hub...", Duration = 3 })
-        getgenv().HubConfig = getgenv().HubConfig or {}
-        getgenv().HubConfig.AuraKill = true
-        getgenv().HubConfig.AutoBring = true
-    end
-})
-
-Tabs.Hubs:Button({
-    Title = "🦊 Tải & Chạy Foxname Hub Dead Rails",
-    Desc = "Kích hoạt hệ thống ESP Ngựa Hiếm và Vật Phẩm độc quyền.",
-    Callback = function()
-        WindUI:Notify({ Title = "Foxname Hub", Content = "Đang kích hoạt hệ thống ESP Foxname...", Duration = 3 })
-        getgenv().HubConfig = getgenv().HubConfig or {}
-        getgenv().HubConfig.ESPRareHorse = true
-        getgenv().HubConfig.ESPItems = true
-    end
-})
-
-Tabs.Hubs:Button({
-    Title = "⚡ Tải Generic Dead Rails GUI (Menu Tổng Hợp)",
-    Desc = "Mở menu tổng hợp các lệnh dịch chuyển và cheat cơ bản.",
-    Callback = function()
-        WindUI:Notify({ Title = "Generic Hub", Content = "Đã nạp thành công menu tổng hợp dự phòng!", Duration = 3 })
-    end
-})
-
--- 3. Tiện Ích Nhanh
-Tabs.Tools:Paragraph({
-    Title = "Tiện ích bổ trợ nhanh",
-    Desc = "Cấu hình trực tiếp Aimbot và chế độ xóa đồ họa tối ưu 100%."
-})
-
-Tabs.Tools:Toggle({
-    Title = "Aimbot Khóa Quái Vật (Tâm Màn Hình)",
-    Default = false,
-    Callback = function(state)
-        getgenv().MasterAimbot = state
-    end
-})
-
-Tabs.Tools:Slider({
-    Title = "Bán Kính Vòng Tròn FOV",
-    Min = 50,
-    Max = 500,
-    Default = 150,
-    Callback = function(value)
-        getgenv().MasterFOV = value
-    end
-})
-
-Tabs.Tools:Toggle({
-    Title = "Xóa Đồ Họa Mở Cần Thiết 100% (Ép Buộc Siêu Mượt)",
-    Default = false,
-    Callback = function(state)
-        getgenv().ForcedFPSBoost = state
-        if state then
-            pcall(function()
-                settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-                Workspace.StreamingEnabled = true
-                Lighting.GlobalShadows = false
-                Lighting.FogEnd = 999999
-                Lighting.Brightness = 2
-                Lighting.ClockTime = 14
-
-                for _, v in ipairs(Lighting:GetChildren()) do
-                    if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") then
-                        v:Destroy()
-                    end
-                end
-
-                for _, part in ipairs(Workspace:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.Material = Enum.Material.SmoothPlastic
-                        part.Reflectance = 0
-                        part.CastShadow = false
-                    elseif part:IsA("Decal") or part:IsA("Texture") or part:IsA("ParticleEmitter") or part:IsA("Trail") or part:IsA("Fire") or part:IsA("Smoke") or part:IsA("Sparkles") then
-                        part:Destroy()
-                    end
-                end
-            end)
-        end
-    end
-})
-
--- 4. Cài Đặt
-Tabs.Config:Button({
-    Title = "Đóng / Hủy Hub",
-    Desc = "Dọn dẹp giao diện menu và bộ nhớ",
-    Callback = function()
-        WindUI:Window():Destroy()
-    end
-})
-
--- 5. Tác Giả
-Tabs.Creators:Paragraph({
-    Title = "Master Hub Community",
-    Desc = "Tổng hợp script tối ưu chạy mượt mà 100%."
-})
-
-WindUI:Notify({ Title = "Thành công", Content = "Master Script Hub đã sẵn sàng hoạt động!", Duration = 4 })
-
--- ==============================================================================
--- LOGIC TỔNG HỢP CHẠY NGẦM & TĂNG FPS 100%
--- ==============================================================================
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
+local CoreGui = game:GetService("CoreGui")
 local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-getgenv().MasterFOV = 150
+-- Xóa menu cũ nếu có để tránh trùng lặp
+if CoreGui:FindFirstChild("DeadRailsMasterNativeMenu") then
+    CoreGui.DeadRailsMasterNativeMenu:Destroy()
+end
 
--- Vòng tròn FOV Aimbot
+-- Tạo ScreenGui chính
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeadRailsMasterNativeMenu"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Khung Main Frame (Menu chính)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -220, 0.5, -170)
+MainFrame.Size = UDim2.new(0, 440, 0, 340)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+-- Tiêu đề Menu
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = MainFrame
+TitleLabel.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+TitleLabel.BorderSizePixel = 0
+TitleLabel.Size = UDim2.new(1, 0, 0, 45)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Text = "DEAD RAILS - MASTER HUB VIP"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 18
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = TitleLabel
+
+-- Khu vực chứa các tính năng (ScrollingFrame)
+local ScrollContainer = Instance.new("ScrollingFrame")
+ScrollContainer.Parent = MainFrame
+ScrollContainer.BackgroundTransparency = 1
+ScrollContainer.Position = UDim2.new(0, 10, 0, 55)
+ScrollContainer.Size = UDim2.new(1, -20, 1, -65)
+ScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 400)
+ScrollContainer.ScrollBarThickness = 6
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ScrollContainer
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 8)
+
+-- Biến cấu hình trạng thái
+getgenv().MasterConfig = {
+    Aimbot = false,
+    AuraKill = false,
+    FPSBoost = false
+}
+
+-- Hàm tạo nút bấm Bật/Tắt (Toggle) trực quan
+local function CreateNativeToggle(name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = ScrollContainer
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.Size = UDim2.new(1, 0, 0, 38)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = name .. ": [TẮT]"
+    btn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    btn.TextSize = 15
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            btn.Text = name .. ": [BẬT]"
+            btn.TextColor3 = Color3.fromRGB(80, 255, 80)
+            btn.BackgroundColor3 = Color3.fromRGB(30, 90, 30)
+        else
+            btn.Text = name .. ": [TẮT]"
+            btn.TextColor3 = Color3.fromRGB(255, 80, 80)
+            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        end
+        callback(state)
+    end)
+end
+
+-- Thêm các tính năng chính vào Menu Gốc
+CreateNativeToggle("Aimbot Khóa Quái Vật (Tâm Màn Hình)", function(state)
+    getgenv().MasterConfig.Aimbot = state
+end)
+
+CreateNativeToggle("Aura Kill (Càn quét quái tự động)", function(state)
+    getgenv().MasterConfig.AuraKill = state
+end)
+
+CreateNativeToggle("Xóa Đồ Họa & Tăng FPS Siêu Mượt", function(state)
+    getgenv().MasterConfig.FPSBoost = state
+    if state then
+        pcall(function()
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+            Lighting.GlobalShadows = false
+            Lighting.FogEnd = 999999
+            Lighting.Brightness = 2
+            for _, part in ipairs(Workspace:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Material = Enum.Material.SmoothPlastic
+                    part.Reflectance = 0
+                    part.CastShadow = false
+                elseif part:IsA("Decal") or part:IsA("Texture") or part:IsA("ParticleEmitter") then
+                    part:Destroy()
+                end
+            end
+        end)
+    end
+end)
+
+-- Nút Đóng Menu
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = ScrollContainer
+CloseBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 30)
+CloseBtn.Size = UDim2.new(1, 0, 0, 38)
+CloseBtn.Font = Enum.Font.SourceSansBold
+CloseBtn.Text = "ĐÓNG / HỦY MENU"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 15
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+print("🔥 DEAD RAILS CLEANED MENU LOADED SUCCESS!")
+
+
+-- ==============================================================================
+-- LOGIC XỬ LÝ NGẦM (AIMBOT & ORIGINAL AURA KILL)
+-- ==============================================================================
+
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Visible = false
 FOVCircle.Transparency = 0.7
@@ -169,14 +168,13 @@ FOVCircle.Radius = 150
 FOVCircle.Filled = false
 
 RunService.RenderStepped:Connect(function()
-    FOVCircle.Radius = tonumber(getgenv().MasterFOV) or 150
     FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    FOVCircle.Visible = (getgenv().MasterAimbot == true)
+    FOVCircle.Visible = getgenv().MasterConfig.Aimbot
 
-    if getgenv().MasterAimbot then
+    if getgenv().MasterConfig.Aimbot then
         local centerScreen = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
         local closestTarget = nil
-        local shortestDist = getgenv().MasterFOV
+        local shortestDist = 150
 
         for _, obj in ipairs(Workspace:GetChildren()) do
             if obj:IsA("Model") and obj ~= LocalPlayer.Character and not Players:GetPlayerFromCharacter(obj) then
@@ -201,24 +199,19 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Ép Buộc Xóa Đồ Họa & Tăng FPS Liên Tục
-RunService.Stepped:Connect(function()
-    if getgenv().ForcedFPSBoost then
-        pcall(function()
-            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-            Lighting.GlobalShadows = false
-            Lighting.FogEnd = 999999
-            Lighting.Brightness = 2
-
-            for _, part in ipairs(Workspace:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Material = Enum.Material.SmoothPlastic
-                    part.Reflectance = 0
-                    part.CastShadow = false
-                elseif part:IsA("Decal") or part:IsA("Texture") or part:IsA("ParticleEmitter") then
-                    part:Destroy()
+-- Aura Kill chuẩn ban đầu (Càn quét tức thì không độ trễ)
+RunService.Heartbeat:Connect(function()
+    if not getgenv().MasterConfig.AuraKill then return end
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        for _, obj in ipairs(Workspace:GetChildren()) do
+            if obj:IsA("Model") and obj ~= char and not Players:GetPlayerFromCharacter(obj) then
+                local humanoid = obj:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    humanoid.Health = 0
                 end
             end
-        end)
-    end
+        end
+    end)
 end)
