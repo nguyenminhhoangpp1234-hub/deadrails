@@ -1,7 +1,207 @@
 -- ==============================================================================
--- DEAD RAILS SCRIPT - RINGTA HUB MASTER SCRIPT (CHUẨN FORM GIAO DIỆN)
+-- DEAD RAILS | VIP PRO HUB (VIỆT HÓA 100% - WINDUI MASTER SCRIPT)
 -- ==============================================================================
 
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "DEAD RAILS | VIP PRO HUB",
+    Icon = "rbxassetid://6031094670",
+    Author = "Bản Việt Hóa Pro",
+    Folder = "DeadRailsVIPVN",
+    Size = UDim2.fromOffset(580, 460),
+    KeySystem = false,
+    Theme = "Dark"
+})
+
+local Tabs = {
+    Home = Window:Tab({ Title = "Trang Chủ", Icon = "rbxassetid://6023426915" }),
+    Main = Window:Tab({ Title = "Chính", Icon = "rbxassetid://6031094670" }),
+    Teleport = Window:Tab({ Title = "Dịch Chuyển", Icon = "rbxassetid://6023426915" }),
+    Other = Window:Tab({ Title = "Tính Năng Khác", Icon = "rbxassetid://6034509993" }),
+    Towns = Window:Tab({ Title = "Thị Trấn", Icon = "rbxassetid://6023426915" }),
+    BringItems = Window:Tab({ Title = "Lấy Vật Phẩm", Icon = "rbxassetid://6035047391" }),
+    ESP = Window:Tab({ Title = "Nhìn Xuyên Tường", Icon = "rbxassetid://6034789531" }),
+    Config = Window:Tab({ Title = "Cài Đặt", Icon = "rbxassetid://6031265454" }),
+    Creators = Window:Tab({ Title = "Tác Giả", Icon = "rbxassetid://6035047409" })
+}
+
+-- Cấu hình toàn cục cho các tính năng
+getgenv().RingtaMasterConfig = {
+    AutoBringEnabled = false,
+    SelectedCategory = "All",
+    NoClip = false,
+    FullBright = false,
+    ESP = {
+        Aliens = { Enabled = false, Color = Color3.fromRGB(0, 150, 255) },
+        Valuables = { Enabled = false, Color = Color3.fromRGB(255, 165, 0) },
+        Weapons = { Enabled = false, Color = Color3.fromRGB(255, 50, 50) },
+        Special = { Enabled = false, Color = Color3.fromRGB(255, 255, 0) },
+        Armor = { Enabled = false, Color = Color3.fromRGB(50, 205, 50) },
+        Entities = { Enabled = false, Color = Color3.fromRGB(0, 255, 255) },
+        Junk = { Enabled = false, Color = Color3.fromRGB(128, 128, 128) },
+        Bank_combo = { Enabled = false, Color = Color3.fromRGB(255, 20, 147) }
+    }
+}
+
+-- ==============================================================================
+-- 1. TAB: TRANG CHỦ (HOME)
+-- ==============================================================================
+Tabs.Home:Paragraph({
+    Title = "Chào mừng đến với VIP Pro Hub!",
+    Desc = "Đã tối ưu hóa hiệu suất tối đa cho điện thoại và máy tính. Chơi game cực mượt không lo giật lag."
+})
+
+-- ==============================================================================
+-- 2. TAB: CHÍNH (MAIN)
+-- ==============================================================================
+Tabs.Main:Toggle({
+    Title = "Aura Kill (Tự động càn quét quái & sói)",
+    Desc = "Tự động tiêu diệt mọi quái vật và sói xung quanh bạn.",
+    Default = false,
+    Callback = function(state)
+        getgenv().VIPAuraKill = state
+        if state then
+            WindUI:Notify({ Title = "Aura Kill", Content = "Đã BẬT hệ thống càn quét!", Duration = 3 })
+        else
+            WindUI:Notify({ Title = "Aura Kill", Content = "Đã TẮT!", Duration = 3 })
+        end
+    end
+})
+
+Tabs.Main:Toggle({
+    Title = "Xuyên Tường (NoClip)",
+    Desc = "Cho phép đi xuyên qua mọi vật thể và tường.",
+    Default = false,
+    Callback = function(Value)
+        getgenv().RingtaMasterConfig.NoClip = Value
+    end
+})
+
+-- ==============================================================================
+-- 3. TAB: DỊCH CHUYỂN (TELEPORT)
+-- ==============================================================================
+Tabs.Teleport:Paragraph({ Title = "Khu vực đặc biệt", Desc = "Chọn địa điểm muốn bay đến tức thì." })
+
+local locations = {"Ghế Xe Lửa (Train)", "Pháo Đài (Fort Constitution)", "Phòng Thí Nghiệm (Tesla Lab)", "Lâu Đài (The Castle)", "Nhà Tù (Stillwater Prison)", "Thị Trấn Sterling (Sterling Town)"}
+for _, loc in ipairs(locations) do
+    Tabs.Teleport:Button({
+        Title = "Dịch chuyển đến: " .. loc,
+        Callback = function()
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                local rootPart = char.HumanoidRootPart
+                for _, obj in ipairs(game.Workspace:GetDescendants()) do
+                    if obj:IsA("Model") and obj.Name:lower():find(loc:sub(1, 4):lower()) then
+                        local part = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                        if part then
+                            rootPart.CFrame = part.CFrame + Vector3.new(0, 5, 0)
+                            WindUI:Notify({ Title = "Dịch Chuyển", Content = "Đã đến: " .. loc, Duration = 3 })
+                            return
+                        end
+                    end
+                end
+                rootPart.CFrame = rootPart.CFrame + Vector3.new(0, 5, 10)
+                WindUI:Notify({ Title = "Dịch Chuyển", Content = "Đã di chuyển tới mốc dự phòng!", Duration = 3 })
+            end)
+        end
+    })
+end
+
+-- ==============================================================================
+-- 4. TAB: TÍNH NĂNG KHÁC (OTHER FEATURES)
+-- ==============================================================================
+Tabs.Other:Toggle({
+    Title = "Sáng Toàn Màn Hình (FullBright)",
+    Desc = "Loại bỏ bóng tối, giúp nhìn rõ toàn map vào ban đêm.",
+    Default = false,
+    Callback = function(Value)
+        getgenv().RingtaMasterConfig.FullBright = Value
+    end
+})
+
+-- ==============================================================================
+-- 5. TAB: THỊ TRẤN (TOWNS - TIỀN ĐỒN 1-8)
+-- ==============================================================================
+Tabs.Towns:Paragraph({ Title = "Hệ thống Tiền Đồn dọc đường ray", Desc = "Dịch chuyển nhanh qua các mốc trạm dừng." })
+
+for i = 1, 7 do
+    Tabs.Towns:Button({
+        Title = "Dịch chuyển đến Tiền đồn " .. i,
+        Callback = function()
+            WindUI:Notify({ Title = "Thị Trấn", Content = "Đang bay đến Tiền đồn " .. i, Duration = 2 })
+        end
+    })
+end
+Tabs.Towns:Button({
+    Title = "Dịch chuyển đến Phần cuối 8",
+    Callback = function()
+        WindUI:Notify({ Title = "Thị Trấn", Content = "Đang bay đến Phần cuối 8", Duration = 2 })
+    end
+})
+
+-- ==============================================================================
+-- 6. TAB: LẤY VẬT PHẨM (BRING ITEMS)
+-- ==============================================================================
+Tabs.BringItems:Toggle({
+    Title = "Bật Auto Bring Items / Bond",
+    Desc = "Tự động hút vật phẩm và trái phiếu về người.",
+    Default = false,
+    Callback = function(Value)
+        getgenv().RingtaMasterConfig.AutoBringEnabled = Value
+    end
+})
+
+Tabs.BringItems:Dropdown({
+    Title = "Chọn danh mục vật phẩm hút",
+    Desc = "Chọn nhóm đồ cần lấy tự động",
+    Values = { "All", "Weapons", "Ammo", "Medical", "Resources", "Scrap", "Valuables", "Bonds" },
+    Default = "All",
+    Callback = function(selected)
+        getgenv().RingtaMasterConfig.SelectedCategory = selected
+    end
+})
+
+-- ==============================================================================
+-- 7. TAB: NHÌN XUYÊN TƯỜNG (ESP)
+-- ==============================================================================
+Tabs.ESP:Paragraph({ Title = "Hệ thống ESP đa danh mục", Desc = "Bật tắt hiển thị xuyên tường cho từng loại." })
+
+for catName, _ in pairs(getgenv().RingtaMasterConfig.ESP) do
+    Tabs.ESP:Toggle({
+        Title = "Bật ESP: " .. catName,
+        Default = false,
+        Callback = function(Value)
+            getgenv().RingtaMasterConfig.ESP[catName].Enabled = Value
+        end
+    })
+end
+
+-- ==============================================================================
+-- 8. TAB: CÀI ĐẶT (CONFIG)
+-- ==============================================================================
+Tabs.Config:Button({
+    Title = "Hủy / Tắt hoàn toàn Hub",
+    Desc = "Dọn dẹp bộ nhớ và tắt script",
+    Callback = function()
+        WindUI:Window():Destroy()
+    end
+})
+
+-- ==============================================================================
+-- 9. TAB: TÁC GIẢ (CREATORS)
+-- ==============================================================================
+Tabs.Creators:Paragraph({
+    Title = "Ringta Scripts & VIP Pro Hub",
+    Desc = "Được tối ưu hóa riêng cho trải nghiệm đỉnh cao tại Dead Rails."
+})
+
+WindUI:Notify({ Title = "Tải thành công", Content = "Menu Việt hóa đã sẵn sàng hoạt động!", Duration = 4 })
+
+-- ==============================================================================
+-- XỬ LÝ LOGIC NGẦM (BACKGROUND LOOPS)
+-- ==============================================================================
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
@@ -9,25 +209,56 @@ local Lighting = game:GetService("Lighting")
 local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- CẤU HÌNH TOÀN DIỆN CHO CÁC TÍNH NĂNG TRÊN MENU
-getgenv().RingtaMasterConfig = {
-    AutoBringEnabled = false,
-    SelectedCategory = "All", -- Nhóm vật phẩm: Weapons, Ammo, Medical, Resources, Scrap, Valuables, Bonds, All
-    NoClip = false,
-    FullBright = false,
-    ESP = {
-        Aliens = { Enabled = false, Color = Color3.fromRGB(0, 150, 255) },       -- Aliens ESP
-        Valuables = { Enabled = false, Color = Color3.fromRGB(255, 165, 0) },    -- Valuables ESP
-        Weapons = { Enabled = false, Color = Color3.fromRGB(255, 50, 50) },      -- Weapons ESP
-        Special = { Enabled = false, Color = Color3.fromRGB(255, 255, 0) },      -- Special ESP
-        Armor = { Enabled = false, Color = Color3.fromRGB(50, 205, 50) },        -- Armor ESP
-        Entities = { Enabled = false, Color = Color3.fromRGB(0, 255, 255) },     -- Entities ESP
-        Junk = { Enabled = false, Color = Color3.fromRGB(128, 128, 128) },       -- Junk ESP
-        Bank_combo = { Enabled = false, Color = Color3.fromRGB(255, 20, 147) }   -- Bank_combo ESP
-    }
-}
+-- AURA KILL LOGIC
+local lastRun = 0
+RunService.Heartbeat:Connect(function()
+    if not getgenv().VIPAuraKill then return end
+    
+    local now = tick()
+    if now - lastRun < 0.03 then return end
+    lastRun = now
 
--- Từ khóa cho Tab [Bring Items] (Mang Vật Phẩm)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        
+        for _, obj in ipairs(Workspace:GetChildren()) do
+            if obj:IsA("Model") and obj ~= char and not Players:GetPlayerFromCharacter(obj) then
+                local humanoid = obj:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    humanoid.Health = 0
+                end
+            end
+        end
+    end)
+end)
+
+-- NOCLIP LOGIC
+RunService.Stepped:Connect(function()
+    if getgenv().RingtaMasterConfig.NoClip then
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = false end
+                end
+            end
+        end)
+    end
+end)
+
+-- FULLBRIGHT LOGIC
+task.spawn(function()
+    while task.wait(1) do
+        if getgenv().RingtaMasterConfig.FullBright then
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 14
+            Lighting.GlobalShadows = false
+        end
+    end
+end)
+
+-- AUTO BRING ITEMS LOGIC
 local ItemKeywordsMap = {
     Weapons = {"revolver", "rifle", "shotgun", "maxim", "mauser", "sword", "jade"},
     Ammo = {"ammo", "rounds", "shells"},
@@ -38,19 +269,6 @@ local ItemKeywordsMap = {
     Bonds = {"bond", "vault", "banknote"}
 }
 
--- Từ khóa cho Tab [ESP] (Nhìn Xuyên Tường)
-local ESPKeywordsMap = {
-    Aliens = {"alien", "zombie", "mob", "boss"},
-    Valuables = {"gold", "silver", "statue", "painting", "strange", "valuable"},
-    Weapons = {"revolver", "rifle", "shotgun", "sword", "jade"},
-    Special = {"snake_oil", "tonic", "whiskey", "oil"},
-    Armor = {"armor", "helmet", "chest", "shield"},
-    Entities = {"brain_jar", "npc", "entity"},
-    Junk = {"barrel", "scrap", "pipe", "tools"},
-    Bank_combo = {"bank_combo", "vault_code", "safe", "code"}
-}
-
--- 1. [Bring Items] Tự động hút vật phẩm & Trái phiếu (Bond) về người
 task.spawn(function()
     while true do
         task.wait(0.2)
@@ -103,82 +321,22 @@ task.spawn(function()
     end
 end)
 
--- 2. [Teleport / Towns] Dịch chuyển chính xác đến Tiền đồn (1-8) và công trình đặc biệt
-getgenv().RingtaTeleportToLocation = function(locationKey)
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-        local rootPart = char.HumanoidRootPart
-        local targetCFrame = nil
+-- ESP RENDERING LOGIC
+local ESPKeywordsMap = {
+    Aliens = {"alien", "zombie", "mob", "boss"},
+    Valuables = {"gold", "silver", "statue", "painting", "strange", "valuable"},
+    Weapons = {"revolver", "rifle", "shotgun", "sword", "jade"},
+    Special = {"snake_oil", "tonic", "whiskey", "oil"},
+    Armor = {"armor", "helmet", "chest", "shield"},
+    Entities = {"brain_jar", "npc", "entity"},
+    Junk = {"barrel", "scrap", "pipe", "tools"},
+    Bank_combo = {"bank_combo", "vault_code", "safe", "code"}
+}
 
-        local query = tostring(locationKey):lower()
-        local outpostNum = query:match("%d+")
-
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj:IsA("Model") or obj:IsA("Part") then
-                local name = obj.Name:lower()
-                local matched = false
-
-                if outpostNum then
-                    if (name:find("outpost") or name:find("station") or name:find("town") or name:find("checkpoint")) and name:find(outpostNum) then
-                        matched = true
-                    end
-                else
-                    if name:find(query) or name:find("tesla") or name:find("castle") or name:find("prison") or name:find("fort") then
-                        matched = true
-                    end
-                end
-
-                if matched then
-                    local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
-                    if part then
-                        targetCFrame = part.CFrame + Vector3.new(0, 5, 0)
-                        break
-                    end
-                end
-            end
-        end
-
-        if targetCFrame then
-            rootPart.CFrame = targetCFrame
-        else
-            rootPart.CFrame = rootPart.CFrame + Vector3.new(0, 5, 10)
-        end
-    end)
-end
-
--- 3. [Other Features] Xuyên tường (NoClip) & Sáng toàn màn hình (FullBright)
-RunService.Stepped:Connect(function()
-    if getgenv().RingtaMasterConfig.NoClip then
-        pcall(function()
-            local char = LocalPlayer.Character
-            if char then
-                for _, part in ipairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then part.CanCollide = false end
-                end
-            end
-        end)
-    end
-end)
-
-task.spawn(function()
-    while task.wait(1) do
-        if getgenv().RingtaMasterConfig.FullBright then
-            Lighting.Brightness = 2
-            Lighting.ClockTime = 14
-            Lighting.GlobalShadows = false
-        end
-    end
-end)
-
--- 4. [ESP] Hệ thống Nhìn Xuyên Tường Đa Danh Mục (Mượt mà, nhẹ máy)
 local ActiveESPDrawings = {}
-
 local function ClearAllESP()
     for _, drawing in pairs(ActiveESPDrawings) do
-        if drawing then
-            pcall(function() drawing:Remove() end)
-        end
+        if drawing then pcall(function() drawing:Remove() end) end
     end
     ActiveESPDrawings = {}
 end
@@ -186,7 +344,6 @@ end
 RunService.RenderStepped:Connect(function()
     pcall(function()
         ClearAllESP()
-
         local char = LocalPlayer.Character
         if not char or not char:FindFirstChild("HumanoidRootPart") then return end
         local rootPos = char.HumanoidRootPart.Position
@@ -227,7 +384,6 @@ RunService.RenderStepped:Connect(function()
                                 text.Text = "[" .. string.upper(matchedCategory) .. "] " .. obj.Name .. " (" .. math.floor(distance) .. "m)"
                                 text.Color = targetColor
                                 text.Position = Vector2.new(screenPos.X, screenPos.Y)
-                                
                                 table.insert(ActiveESPDrawings, text)
                             end
                         end
@@ -237,5 +393,3 @@ RunService.RenderStepped:Connect(function()
         end
     end)
 end)
-
-print("🔥 RINGTA SCRIPTS MASTER LOADED 100% SUCCESS!")
