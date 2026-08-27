@@ -44,7 +44,7 @@ end
 
 RunService.Heartbeat:Connect(function()
     local currentTick = tick()
-    if currentTick - lastTick < 0.02 then return end
+    if currentTick - lastTick < 0.05 then return end
     lastTick = currentTick
     RunAuraKill()
 end)
