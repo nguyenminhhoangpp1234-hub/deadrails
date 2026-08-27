@@ -1,91 +1,84 @@
 -- =================================================
--- DEAD RAILS CUSTOM MENU (CLEAN VERSION)
+-- DEAD RAILS PRO MENU (CÓ NÚT THU GỌN GÓC TRÊN)
 -- =================================================
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 
-local Window = Fluent:CreateWindow({
-    Title = "Dead Rails | Pro Script",
-    SubTitle = "v1.0",
-    TabWidth = 160,
+local Window = WindUI:CreateWindow({
+    Title = "DEAD RAILS SCRIPT",
+    Icon = "rbxassetid://6031094670",
+    Author = "Pro Menu",
+    Folder = "DeadRailsConfig",
     Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.RightControl
+    KeySystem = false,
+    Theme = "Dark"
 })
 
--- Màu đỏ mận đặc trưng
-Fluent.Themes.Dark.Accent = Color3.fromRGB(165, 30, 55)
-
+-- Tạo các Tab dọc bên trái y hệt ảnh mẫu
 local Tabs = {
-    Home = Window:AddTab({ Title = "Home", Icon = "rbxassetid://6023426915" }),
-    Main = Window:AddTab({ Title = "Main", Icon = "rbxassetid://6031094670" }),
-    Teleport = Window:AddTab({ Title = "Teleport", Icon = "rbxassetid://6023426915" }),
-    Other = Window:AddTab({ Title = "Other Features", Icon = "rbxassetid://6034509993" }),
-    Towns = Window:AddTab({ Title = "Towns", Icon = "rbxassetid://6023426915" }),
-    BringItems = Window:AddTab({ Title = "Bring Items", Icon = "rbxassetid://6035047391" }),
-    ESP = Window:AddTab({ Title = "ESP", Icon = "rbxassetid://6034789531" }),
-    Config = Window:AddTab({ Title = "Config", Icon = "rbxassetid://6031265454" }),
-    Creators = Window:AddTab({ Title = "Content Creators", Icon = "rbxassetid://6035047409" })
+    Home = Window:Tab({ Title = "Home", Icon = "rbxassetid://6023426915" }),
+    Main = Window:Tab({ Title = "Main", Icon = "rbxassetid://6031094670" }),
+    Teleport = Window:Tab({ Title = "Teleport", Icon = "rbxassetid://6023426915" }),
+    Other = Window:Tab({ Title = "Other Features", Icon = "rbxassetid://6034509993" }),
+    Towns = Window:Tab({ Title = "Towns", Icon = "rbxassetid://6023426915" }),
+    BringItems = Window:Tab({ Title = "Bring Items", Icon = "rbxassetid://6035047391" }),
+    ESP = Window:Tab({ Title = "ESP", Icon = "rbxassetid://6034789531" }),
+    Config = Window:Tab({ Title = "Config", Icon = "rbxassetid://6031265454" }),
+    Creators = Window:Tab({ Title = "Content Creators", Icon = "rbxassetid://6035047409" })
 }
 
-local Options = Fluent.Options
+-- Tab HOME
+Tabs.Home:Paragraph({
+    Title = "Chào mừng bạn đến với Script!",
+    Desc = "Sử dụng nút dấu trừ (-) ở góc trên để thu gọn/mở lại menu."
+})
 
--- --- TAB MAIN ---
-local MainSection = Tabs.Main:AddSection("Automation & Combat")
-
-MainSection:AddToggle("AuraKillToggle", {
+-- Tab MAIN (Aura Kill)
+Tabs.Main:Toggle({
     Title = "Aura Kill (Auto Kill Mobs/Sói)",
-    Description = "Tự động tiêu diệt quái và sói xung quanh.",
-    Default = false
+    Desc = "Tự động tiêu diệt quái và sói xung quanh.",
+    Default = false,
+    Callback = function(state)
+        getgenv().CustomAura = state
+        if state then
+            WindUI:Notify({ Title = "Aura Kill", Content = "Đã Bật!", Duration = 3 })
+        else
+            WindUI:Notify({ Title = "Aura Kill", Content = "Đã Tắt!", Duration = 3 })
+        end
+    end
 })
 
-Options.AuraKillToggle:OnChanged(function()
-    getgenv().CustomAura = Options.AuraKillToggle.Value
-    if getgenv().CustomAura then
-        Fluent:Notify({ Title = "Aura Kill", Content = "Đã Bật!", Duration = 3 })
-    else
-        Fluent:Notify({ Title = "Aura Kill", Content = "Đã Tắt!", Duration = 3 })
-    end
-end)
-
--- --- TAB BRING ITEMS ---
-local ItemSection = Tabs.BringItems:AddSection("Infinite Items / Spawner")
-
-ItemSection:AddDropdown("ItemChoice", {
+-- Tab BRING ITEMS (Danh sách chọn item)
+Tabs.BringItems:Dropdown({
     Title = "Select items for Infinite Get",
+    Desc = "Chọn vật phẩm bạn muốn lấy",
     Values = { "rifle", "shotgun", "bandage", "snake_oil", "dynamite" },
-    Multi = false,
-    Default = 1,
-})
-
-ItemSection:AddButton({
-    Title = "Get Selected Item",
-    Description = "Nhận item đã chọn từ danh sách.",
-    Callback = function()
-        local selected = Options.ItemChoice.Value
-        Fluent:Notify({
-            Title = "Item Spawner",
-            Content = "Đang lấy: " + tostring(selected),
-            Duration = 3
-        })
+    Default = "rifle",
+    Callback = function(selected)
+        getgenv().SelectedChosenItem = selected
     end
 })
 
--- --- CONFIG & SETTINGS ---
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetFolder("DeadRailsCustom")
-SaveManager:BuildInterfaceSection(Tabs.Config)
-InterfaceManager:BuildInterfaceSection(Tabs.Config)
+Tabs.BringItems:Button({
+    Title = "Get Selected Item",
+    Desc = "Bấm để nhận item đã chọn",
+    Callback = function()
+        local item = getgenv().SelectedChosenItem or "rifle"
+        WindUI:Notify({ Title = "Item Spawner", Content = "Đang lấy: " .. tostring(item), Duration = 3 })
+    end
+})
 
-Window:SelectTab(2)
-Fluent:Notify({ Title = "Script Loaded", Content = "Giao diện đã sẵn sàng!", Duration = 4 })
+-- Các Tab khác
+Tabs.Teleport:Paragraph({ Title = "Teleport", Desc = "Đang cập nhật." })
+Tabs.Other:Paragraph({ Title = "Other Features", Desc = "Các tính năng phụ." })
+Tabs.Towns:Paragraph({ Title = "Towns", Desc = "Danh sách thị trấn." })
+Tabs.ESP:Paragraph({ Title = "ESP", Desc = "Cài đặt ESP." })
+Tabs.Config:Paragraph({ Title = "Config", Desc = "Lưu cấu hình." })
+Tabs.Creators:Paragraph({ Title = "Content Creators", Desc = "Dead Rails Script." })
 
--- --- HỆ THỐNG CHẠY NGẦM AURA KILL ---
+WindUI:Notify({ Title = "Thành công", Content = "Đã tải menu đầy đủ tính năng!", Duration = 4 })
+
+-- === HỆ THỐNG CHẠY NGẦM AURA KILL ===
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
