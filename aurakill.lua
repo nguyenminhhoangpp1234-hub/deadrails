@@ -1,11 +1,76 @@
+-- =================================================
+-- DEAD RAILS AURA KILL MENU SCRIPT
+-- =================================================
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
-local lastTick = 0
+-- Xóa menu cũ nếu có để tránh bị trùng
+if CoreGui:FindFirstChild("DeadRailsAuraMenu") then
+    CoreGui.DeadRailsAuraMenu:Destroy()
+end
 
-local function RunAuraKill()
+-- Tạo giao diện Menu đơn giản, dễ nhìn trên Delta
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeadRailsAuraMenu"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.1, 0, 0.1, 0)
+MainFrame.Size = UDim2.new(0, 220, 0, 130)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Có thể giữ và kéo menu đi quanh màn hình
+
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Dead Rails - Aura Kill"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Parent = MainFrame
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleButton.Position = UDim2.new(0.1, 0, 0.45, 0)
+ToggleButton.Size = UDim2.new(0, 176, 0, 45)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "Aura Kill: OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 16
+
+local auraEnabled = false
+
+-- Bấm vào nút để Bật/Tắt
+ToggleButton.MouseButton1Click:Connect(function()
+    auraEnabled = not auraEnabled
+    if auraEnabled then
+        ToggleButton.Text = "Aura Kill: ON"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    else
+        ToggleButton.Text = "Aura Kill: OFF"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    end
+end)
+
+-- Vòng lặp chạy tính năng Aura Kill
+local lastTick = 0
+RunService.Heartbeat:Connect(function()
+    if not auraEnabled then return end
+    local currentTick = tick()
+    if currentTick - lastTick < 0.05 then return end
+    lastTick = currentTick
+
     pcall(function()
         local char = LocalPlayer.Character
         if not char then return end
@@ -40,11 +105,4 @@ local function RunAuraKill()
             end
         end
     end)
-end
-
-RunService.Heartbeat:Connect(function()
-    local currentTick = tick()
-    if currentTick - lastTick < 0.05 then return end
-    lastTick = currentTick
-    RunAuraKill()
 end)
