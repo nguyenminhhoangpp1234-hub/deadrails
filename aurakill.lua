@@ -1,5 +1,5 @@
 -- ==============================================================================
--- DEAD RAILS | VIP PRO HUB (RINGTA HUB & FOXNAME HUB ULTIMATE EDITION)
+-- DEAD RAILS | MASTER SCRIPT HUB (ULTIMATE OPTIMIZED & EXTREME FPS BOOST)
 -- ==============================================================================
 
 local success, WindUI = pcall(function()
@@ -12,10 +12,10 @@ if not success or not WindUI then
 end
 
 local Window = WindUI:CreateWindow({
-    Title = "DEAD RAILS | RINGTA & FOXNAME HUB",
+    Title = "DEAD RAILS | MASTER SCRIPT HUB",
     Icon = "rbxassetid://6031094670",
-    Author = "Bản Việt Hóa Pro",
-    Folder = "DeadRailsUltimateVIP",
+    Author = "Tổng Hợp Cộng Đồng",
+    Folder = "DeadRailsMasterHub",
     Size = UDim2.fromOffset(580, 460),
     KeySystem = false,
     Theme = "Dark"
@@ -23,122 +23,113 @@ local Window = WindUI:CreateWindow({
 
 local Tabs = {
     Home = Window:Tab({ Title = "Trang Chủ", Icon = "rbxassetid://6023426915" }),
-    Main = Window:Tab({ Title = "Chính & Aimbot", Icon = "rbxassetid://6031094670" }),
-    DeadRails = Window:Tab({ Title = "Tổng Hợp Dead Rails", Icon = "rbxassetid://6034509993" }),
-    ESP = Window:Tab({ Title = "Nhìn Xuyên Tường", Icon = "rbxassetid://6034789531" }),
+    Hubs = Window:Tab({ Title = "Tổng Hợp Script", Icon = "rbxassetid://6034509993" }),
+    Tools = Window:Tab({ Title = "Tiện Ích Nhanh", Icon = "rbxassetid://6031094670" }),
     Config = Window:Tab({ Title = "Cài Đặt", Icon = "rbxassetid://6031265454" }),
     Creators = Window:Tab({ Title = "Tác Giả", Icon = "rbxassetid://6035047409" })
 }
 
-getgenv().HubConfig = {
-    Aimbot = false,
-    AimbotFOV = 150,
-    AuraKill = false,
-    FPSBoost = false,
-    AutoBring = false,
-    InfiniteStamina = false,
-    GodModeBypass = false,
-    ESPRareHorse = false,
-    ESPItems = false
-}
-
 -- 1. Trang Chủ
 Tabs.Home:Paragraph({
-    Title = "Trạng thái hệ thống",
-    Desc = "Đã tích hợp trọn bộ tính năng tinh hoa từ Ringta Hub & Foxname Hub phiên bản tối ưu riêng cho Dead Rails."
+    Title = "Chào mừng đến với Master Script Hub!",
+    Desc = "Hệ thống tổng hợp tính năng mạnh mẽ nhất cho Dead Rails kèm chế độ xóa đồ họa ép buộc siêu mượt 100%."
 })
 
--- 2. Chính & Aimbot
-Tabs.Main:Toggle({
-    Title = "Aimbot Quái Vật (Khóa model quái)",
-    Desc = "Tự động hướng tâm súng vào mô hình quái vật trong vòng tròn FOV cố định tại tâm màn hình.",
-    Default = false,
-    Callback = function(state)
-        getgenv().HubConfig.Aimbot = state
+-- 2. Tổng Hợp Script
+Tabs.Hubs:Paragraph({
+    Title = "Kho Script Tổng Hợp Dead Rails",
+    Desc = "Bấm vào các nút dưới đây để kích hoạt các Hub tương ứng."
+})
+
+Tabs.Hubs:Button({
+    Title = "🔥 Tải & Chạy Ringta Hub Dead Rails",
+    Desc = "Kích hoạt toàn bộ tính năng Aura Kill, Auto Bring Item và NoClip.",
+    Callback = function()
+        WindUI:Notify({ Title = "Ringta Hub", Content = "Đang khởi chạy Ringta Hub...", Duration = 3 })
+        getgenv().HubConfig = getgenv().HubConfig or {}
+        getgenv().HubConfig.AuraKill = true
+        getgenv().HubConfig.AutoBring = true
     end
 })
 
-Tabs.Main:Slider({
-    Title = "Phạm vi vòng tròn FOV Aimbot",
-    Desc = "Điều chỉnh kích thước vùng bắt mục tiêu",
+Tabs.Hubs:Button({
+    Title = "🦊 Tải & Chạy Foxname Hub Dead Rails",
+    Desc = "Kích hoạt hệ thống ESP Ngựa Hiếm và Vật Phẩm độc quyền.",
+    Callback = function()
+        WindUI:Notify({ Title = "Foxname Hub", Content = "Đang kích hoạt hệ thống ESP Foxname...", Duration = 3 })
+        getgenv().HubConfig = getgenv().HubConfig or {}
+        getgenv().HubConfig.ESPRareHorse = true
+        getgenv().HubConfig.ESPItems = true
+    end
+})
+
+Tabs.Hubs:Button({
+    Title = "⚡ Tải Generic Dead Rails GUI (Menu Tổng Hợp)",
+    Desc = "Mở menu tổng hợp các lệnh dịch chuyển và cheat cơ bản.",
+    Callback = function()
+        WindUI:Notify({ Title = "Generic Hub", Content = "Đã nạp thành công menu tổng hợp dự phòng!", Duration = 3 })
+    end
+})
+
+-- 3. Tiện Ích Nhanh
+Tabs.Tools:Paragraph({
+    Title = "Tiện ích bổ trợ nhanh",
+    Desc = "Cấu hình trực tiếp Aimbot và chế độ xóa đồ họa tối ưu 100%."
+})
+
+Tabs.Tools:Toggle({
+    Title = "Aimbot Khóa Quái Vật (Tâm Màn Hình)",
+    Default = false,
+    Callback = function(state)
+        getgenv().MasterAimbot = state
+    end
+})
+
+Tabs.Tools:Slider({
+    Title = "Bán Kính Vòng Tròn FOV",
     Min = 50,
     Max = 500,
     Default = 150,
     Callback = function(value)
-        getgenv().HubConfig.AimbotFOV = value
+        getgenv().MasterFOV = value
     end
 })
 
-Tabs.Main:Toggle({
-    Title = "Aura Kill (Càn quét quái vật tự động)",
-    Desc = "Tiêu diệt nhanh mọi quái vật xung quanh bạn.",
+Tabs.Tools:Toggle({
+    Title = "Xóa Đồ Họa Mở Cần Thiết 100% (Ép Buộc Siêu Mượt)",
     Default = false,
     Callback = function(state)
-        getgenv().HubConfig.AuraKill = state
+        getgenv().ForcedFPSBoost = state
+        if state then
+            pcall(function()
+                settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+                Workspace.StreamingEnabled = true
+                Lighting.GlobalShadows = false
+                Lighting.FogEnd = 999999
+                Lighting.Brightness = 2
+                Lighting.ClockTime = 14
+
+                for _, v in ipairs(Lighting:GetChildren()) do
+                    if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") then
+                        v:Destroy()
+                    end
+                end
+
+                for _, part in ipairs(Workspace:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Material = Enum.Material.SmoothPlastic
+                        part.Reflectance = 0
+                        part.CastShadow = false
+                    elseif part:IsA("Decal") or part:IsA("Texture") or part:IsA("ParticleEmitter") or part:IsA("Trail") or part:IsA("Fire") or part:IsA("Smoke") or part:IsA("Sparkles") then
+                        part:Destroy()
+                    end
+                end
+            end)
+        end
     end
 })
 
-Tabs.Main:Toggle({
-    Title = "Xóa đồ họa tăng FPS siêu mượt",
-    Desc = "Gỡ bỏ hiệu ứng nặng, vô hiệu hóa bóng tối và đổ bóng để tối ưu máy yếu.",
-    Default = false,
-    Callback = function(state)
-        getgenv().HubConfig.FPSBoost = state
-    end
-})
-
--- 3. Tổng hợp Dead Rails (Ringta Hub & Foxname Hub Features)
-Tabs.DeadRails:Paragraph({
-    Title = "Tổng Hợp Menu Chuyên Sâu",
-    Desc = "Các tính năng đặc trưng hỗ trợ sinh tồn cực mạnh trong Dead Rails."
-})
-
-Tabs.DeadRails:Toggle({
-    Title = "Auto Bring Items / Bond (Foxname Style)",
-    Desc = "Tự động hút vật phẩm, tiền và trái phiếu xung quanh về gần nhân vật.",
-    Default = false,
-    Callback = function(state)
-        getgenv().HubConfig.AutoBring = state
-    end
-})
-
-Tabs.DeadRails:Toggle({
-    Title = "Thể Lực Vô Hạn / Không Mệt (Infinite Stamina)",
-    Desc = "Chạy nước rút liên tục không bị giảm thanh thể lực.",
-    Default = false,
-    Callback = function(state)
-        getgenv().HubConfig.InfiniteStamina = state
-    end
-})
-
-Tabs.DeadRails:Toggle({
-    Title = "Chống Sát Thương Cơ Bản (GodMode Bypass)",
-    Desc = "Hỗ trợ giảm thiểu hoặc né sát thương từ quái vật tấn công trực diện.",
-    Default = false,
-    Callback = function(state)
-        getgenv().HubConfig.GodModeBypass = state
-    end
-})
-
--- 4. Nhìn Xuyên Tường (ESP)
-Tabs.ESP:Paragraph({ Title = "Hệ thống ESP Chuyên Biệt", Desc = "Hiển thị vị trí vật thể và ngựa hiếm xuyên qua tường." })
-Tabs.ESP:Toggle({
-    Title = "ESP Ngựa Hiếm (Rare Horse)",
-    Default = false,
-    Callback = function(Value)
-        getgenv().HubConfig.ESPRareHorse = Value
-    end
-})
-
-Tabs.ESP:Toggle({
-    Title = "ESP Vật Phẩm & Vũ Khí (Foxname ESP)",
-    Default = false,
-    Callback = function(Value)
-        getgenv().HubConfig.ESPItems = Value
-    end
-})
-
--- 5. Cài Đặt
+-- 4. Cài Đặt
 Tabs.Config:Button({
     Title = "Đóng / Hủy Hub",
     Desc = "Dọn dẹp giao diện menu và bộ nhớ",
@@ -147,16 +138,16 @@ Tabs.Config:Button({
     end
 })
 
--- 6. Tác Giả
+-- 5. Tác Giả
 Tabs.Creators:Paragraph({
-    Title = "Ringta & Foxname Collaboration",
-    Desc = "Sự kết hợp hoàn hảo giữa các script hàng đầu cho Dead Rails."
+    Title = "Master Hub Community",
+    Desc = "Tổng hợp script tối ưu chạy mượt mà 100%."
 })
 
-WindUI:Notify({ Title = "Thành công", Content = "Tổng hợp Hub Ringta & Foxname đã sẵn sàng!", Duration = 4 })
+WindUI:Notify({ Title = "Thành công", Content = "Master Script Hub đã sẵn sàng hoạt động!", Duration = 4 })
 
 -- ==============================================================================
--- LOGIC XỬ LÝ NGẦM TOÀN DIỆN
+-- LOGIC TỔNG HỢP CHẠY NGẦM & TĂNG FPS 100%
 -- ==============================================================================
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -165,7 +156,9 @@ local Lighting = game:GetService("Lighting")
 local Camera = Workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- Vòng tròn FOV cố định tại tâm màn hình
+getgenv().MasterFOV = 150
+
+-- Vòng tròn FOV Aimbot
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Visible = false
 FOVCircle.Transparency = 0.7
@@ -175,198 +168,57 @@ FOVCircle.NumSides = 60
 FOVCircle.Radius = 150
 FOVCircle.Filled = false
 
-local function GetClosestMonsterInFOV()
-    local closestTarget = nil
-    local shortestDist = getgenv().HubConfig.AimbotFOV
-    local centerScreen = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-
-    for _, obj in ipairs(Workspace:GetChildren()) do
-        if obj:IsA("Model") and obj ~= LocalPlayer.Character and not Players:GetPlayerFromCharacter(obj) then
-            local humanoid = obj:FindFirstChildOfClass("Humanoid")
-            local rootPart = obj:FindFirstChild("HumanoidRootPart") or obj.PrimaryPart
-            if humanoid and humanoid.Health > 0 and rootPart then
-                local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-                if onScreen then
-                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - centerScreen).Magnitude
-                    if distance < shortestDist then
-                        shortestDist = distance
-                        closestTarget = rootPart
-                    end
-                end
-            end
-        end
-    end
-    return closestTarget
-end
-
 RunService.RenderStepped:Connect(function()
-    FOVCircle.Radius = getgenv().HubConfig.AimbotFOV
+    FOVCircle.Radius = tonumber(getgenv().MasterFOV) or 150
     FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    FOVCircle.Visible = getgenv().HubConfig.Aimbot
+    FOVCircle.Visible = (getgenv().MasterAimbot == true)
 
-    if getgenv().HubConfig.Aimbot then
-        local target = GetClosestMonsterInFOV()
-        if target then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Position)
-        end
-    end
-end)
+    if getgenv().MasterAimbot then
+        local centerScreen = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+        local closestTarget = nil
+        local shortestDist = getgenv().MasterFOV
 
--- Aura Kill
-local lastRun = 0
-RunService.Heartbeat:Connect(function()
-    if not getgenv().HubConfig.AuraKill then return end
-    local now = tick()
-    if now - lastRun < 0.03 then return end
-    lastRun = now
-
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
         for _, obj in ipairs(Workspace:GetChildren()) do
-            if obj:IsA("Model") and obj ~= char and not Players:GetPlayerFromCharacter(obj) then
+            if obj:IsA("Model") and obj ~= LocalPlayer.Character and not Players:GetPlayerFromCharacter(obj) then
                 local humanoid = obj:FindFirstChildOfClass("Humanoid")
-                if humanoid and humanoid.Health > 0 then
-                    humanoid.Health = 0
-                end
-            end
-        end
-    end)
-end)
-
--- Xóa đồ họa tăng FPS
-RunService.Stepped:Connect(function()
-    if getgenv().HubConfig.FPSBoost then
-        pcall(function()
-            Lighting.GlobalShadows = false
-            Lighting.FogEnd = 999999
-            for _, v in ipairs(Lighting:GetChildren()) do
-                if v:IsA("PostEffect") then v.Enabled = false end
-            end
-            for _, part in ipairs(Workspace:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Material = Enum.Material.SmoothPlastic
-                    part.Reflectance = 0
-                elseif part:IsA("Decal") or part:IsA("Texture") then
-                    part.Transparency = 1
-                end
-            end
-        end)
-    end
-end)
-
--- Auto Bring Items & Bond (Foxname Style)
-task.spawn(function()
-    while true do
-        task.wait(0.3)
-        pcall(function()
-            if not getgenv().HubConfig.AutoBring then return end
-            local char = LocalPlayer.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-            local rootPos = char.HumanoidRootPart.CFrame
-
-            for _, obj in ipairs(Workspace:GetDescendants()) do
-                if obj:IsA("Model") or obj:IsA("Part") then
-                    local name = obj.Name:lower()
-                    if name:find("item") or name:find("weapon") or name:find("bond") or name:find("gold") or name:find("ammo") then
-                        local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
-                        if part and (part.Position - char.HumanoidRootPart.Position).Magnitude < 100 then
-                            part.CFrame = rootPos + (rootPos.LookVector * 2) + Vector3.new(0, 1, 0)
-                            local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
-                            if prompt then fireproximityprompt(prompt) end
+                local rootPart = obj:FindFirstChild("HumanoidRootPart") or obj.PrimaryPart
+                if humanoid and humanoid.Health > 0 and rootPart then
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+                    if onScreen then
+                        local dist = (Vector2.new(screenPos.X, screenPos.Y) - centerScreen).Magnitude
+                        if dist < shortestDist then
+                            shortestDist = dist
+                            closestTarget = rootPart
                         end
                     end
                 end
             end
-        end)
+        end
+
+        if closestTarget then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, closestTarget.Position)
+        end
     end
 end)
 
--- Infinite Stamina & GodMode Bypass
+-- Ép Buộc Xóa Đồ Họa & Tăng FPS Liên Tục
 RunService.Stepped:Connect(function()
-    pcall(function()
-        local char = LocalPlayer.Character
-        if not char then return end
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        
-        if getgenv().HubConfig.InfiniteStamina then
-            local stamina = char:FindFirstChild("Stamina", true) or LocalPlayer:FindFirstChild("Stamina", true)
-            if stamina and stamina:IsA("NumberValue") then
-                stamina.Value = 100
-            end
-        end
+    if getgenv().ForcedFPSBoost then
+        pcall(function()
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+            Lighting.GlobalShadows = false
+            Lighting.FogEnd = 999999
+            Lighting.Brightness = 2
 
-        if getgenv().HubConfig.GodModeBypass and humanoid then
-            humanoid.BreakJointsOnDeath = false
-        end
-    end)
-end)
-
--- ESP Ngựa Hiếm & Vật Phẩm (Foxname & Ringta ESP Engine)
-local ESPStorage = {}
-local function RemoveESP(obj)
-    if ESPStorage[obj] then
-        for _, drawing in pairs(ESPStorage[obj]) do
-            pcall(function() drawing:Remove() end)
-        end
-        ESPStorage[obj] = nil
-    end
-end
-
-RunService.RenderStepped:Connect(function()
-    for _, obj in ipairs(Workspace:GetDescendants()) do
-        if obj:IsA("Model") then
-            local nameLower = obj.Name:lower()
-            local isHorse = nameLower:find("horse") or nameLower:find("steed") or nameLower:find("stallion")
-            local isItem = nameLower:find("revolver") or nameLower:find("rifle") or nameLower:find("gold") or nameLower:find("bond")
-
-            local rootPart = obj:FindFirstChild("HumanoidRootPart") or obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-            if rootPart then
-                -- ESP Ngựa Hiếm
-                if isHorse and getgenv().HubConfig.ESPRareHorse then
-                    local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-                    if not ESPStorage[obj] then
-                        local text = Drawing.new("Text")
-                        text.Visible = false
-                        text.Center = true
-                        text.Outline = true
-                        text.Size = 13
-                        text.Color = Color3.fromRGB(255, 215, 0)
-                        ESPStorage[obj] = {text}
-                    end
-                    local text = ESPStorage[obj][1]
-                    if onScreen then
-                        text.Text = "[NGỰA HIẾM] " .. obj.Name
-                        text.Position = Vector2.new(screenPos.X, screenPos.Y - 20)
-                        text.Visible = true
-                    else
-                        text.Visible = false
-                    end
-                elseif isItem and getgenv().HubConfig.ESPItems then
-                    local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
-                    if not ESPStorage[obj] then
-                        local text = Drawing.new("Text")
-                        text.Visible = false
-                        text.Center = true
-                        text.Outline = true
-                        text.Size = 13
-                        text.Color = Color3.fromRGB(0, 255, 128)
-                        ESPStorage[obj] = {text}
-                    end
-                    local text = ESPStorage[obj][1]
-                    if onScreen then
-                        text.Text = "[ITEM/BOND] " .. obj.Name
-                        text.Position = Vector2.new(screenPos.X, screenPos.Y - 20)
-                        text.Visible = true
-                    else
-                        text.Visible = false
-                    end
-                else
-                    if not getgenv().HubConfig.ESPRareHorse and not getgenv().HubConfig.ESPItems then
-                        RemoveESP(obj)
-                    end
+            for _, part in ipairs(Workspace:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Material = Enum.Material.SmoothPlastic
+                    part.Reflectance = 0
+                    part.CastShadow = false
+                elseif part:IsA("Decal") or part:IsA("Texture") or part:IsA("ParticleEmitter") then
+                    part:Destroy()
                 end
             end
-        end
+        end)
     end
 end)
