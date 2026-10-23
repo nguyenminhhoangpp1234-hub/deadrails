@@ -1,0 +1,525 @@
+--[[
+DEAD RAILS ULTIMATE HUB - ANDROID UI BASE
+Purpose: touch-friendly UI, item selection, settings and status indicators.
+Important: This file is a UI/configuration base. It does NOT implement game exploits,
+server-side pickup, damage, zombie freezing, aim-lock, or automatic item use.
+Only connect actions that are supported in a game you own or are authorized to modify.
+]]
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+if not player then return end
+
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Avoid duplicate copies if the script is executed again.
+local oldGui = playerGui:FindFirstChild("DeadRailsUltimateHub")
+if oldGui then
+    oldGui:Destroy()
+end
+
+local state = {
+    minimized = false,
+    activeTab = "Tổng quan",
+    toggles = {
+        autoLoot = false,
+        esp = false,
+        autoClimb = false,
+        zombieMode = false,
+        zombieFreeze = false,
+        auraKill = false,
+        headLock = false,
+        autoAttack = false,
+        autoHeal = false,
+    },
+    attackRate = 30,
+    healThreshold = 30,
+    searchText = "",
+    selectedItems = {},
+    espItems = {},
+}
+
+local ITEMS = {
+    "Coal", "Bandage", "Snake Oil", "Lantern", "Torch", "Camera",
+    "Banjo", "Gold Bar", "Gold Nugget", "Gold Watch", "Silver Bar",
+    "Silver Nugget", "Silver Watch", "Bonds", "Gold Statue",
+    "Gold Painting", "Gold Cup", "Gold Plate", "Silver Statue",
+    "Silver Painting", "Silver Cup", "Silver Plate", "Crucifix",
+    "Jade Tablet", "Brain In Jar", "Strange Map", "Strange Machine",
+    "Supply Depot Key", "Skeleton Key", "Lincoln's Top Hat",
+    "Barrel", "Chair", "Rope", "Wheel", "Book", "Newspaper",
+    "Vase", "Teapot", "Money", "Water", "Kerosene", "Milk",
+    "Blood", "Zombie Blood", "Unicorn Blood", "Angel Tears",
+    "Devil Tears", "Primordial Soup", "Cerebrus Blood", "Acid"
+}
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DeadRailsUltimateHub"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = playerGui
+
+local main = Instance.new("Frame")
+main.Name = "Main"
+main.Size = UDim2.fromOffset(590, 390)
+main.Position = UDim2.new(0.5, -295, 0.5, -195)
+main.BackgroundColor3 = Color3.fromRGB(22, 24, 30)
+main.BorderSizePixel = 0
+main.Active = true
+main.Parent = gui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = main
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(72, 78, 94)
+mainStroke.Thickness = 1
+mainStroke.Parent = main
+
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 42)
+header.BackgroundColor3 = Color3.fromRGB(34, 38, 48)
+header.BorderSizePixel = 0
+header.Parent = main
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 12)
+headerCorner.Parent = header
+
+local headerCover = Instance.new("Frame")
+headerCover.Position = UDim2.new(0, 0, 1, -12)
+headerCover.Size = UDim2.new(1, 0, 0, 12)
+headerCover.BackgroundColor3 = header.BackgroundColor3
+headerCover.BorderSizePixel = 0
+headerCover.Parent = header
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Position = UDim2.fromOffset(12, 0)
+title.Size = UDim2.new(1, -110, 1, 0)
+title.Font = Enum.Font.GothamBold
+title.Text = "DEAD RAILS ULTIMATE HUB"
+title.TextColor3 = Color3.fromRGB(240, 242, 248)
+title.TextSize = 15
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
+
+local function makeButton(parent, text, size, position)
+    local button = Instance.new("TextButton")
+    button.Size = size
+    button.Position = position
+    button.BackgroundColor3 = Color3.fromRGB(48, 54, 68)
+    button.BorderSizePixel = 0
+    button.Font = Enum.Font.GothamSemibold
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(240, 242, 248)
+    button.TextSize = 13
+    button.AutoButtonColor = true
+    button.Parent = parent
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 7)
+    corner.Parent = button
+    return button
+end
+
+local minimizeButton = makeButton(header, "−", UDim2.fromOffset(34, 28), UDim2.new(1, -76, 0, 7))
+local closeButton = makeButton(header, "×", UDim2.fromOffset(30, 28), UDim2.new(1, -38, 0, 7))
+closeButton.BackgroundColor3 = Color3.fromRGB(120, 48, 54)
+
+local expandedSize = main.Size
+local minimized = false
+
+minimizeButton.Activated:Connect(function()
+    minimized = not minimized
+    state.minimized = minimized
+    if minimized then
+        expandedSize = main.Size
+        main.Size = UDim2.new(expandedSize.X.Scale, expandedSize.X.Offset, 0, header.Size.Y.Offset)
+        minimizeButton.Text = "+"
+    else
+        main.Size = expandedSize
+        minimizeButton.Text = "−"
+    end
+end)
+
+closeButton.Activated:Connect(function()
+    gui:Destroy()
+end)
+
+-- Drag only from the title bar, suitable for touch and mouse.
+do
+    local dragging = false
+    local dragStart
+    local startPosition
+    local activeInput
+
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPosition = main.Position
+            activeInput = input
+        end
+    end)
+
+    header.InputEnded:Connect(function(input)
+        if input == activeInput
+            or input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+            activeInput = nil
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(
+                startPosition.X.Scale, startPosition.X.Offset + delta.X,
+                startPosition.Y.Scale, startPosition.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+local body = Instance.new("Frame")
+body.Name = "Body"
+body.Position = UDim2.fromOffset(10, 50)
+body.Size = UDim2.new(1, -20, 1, -60)
+body.BackgroundTransparency = 1
+body.Parent = main
+
+local tabPanel = Instance.new("ScrollingFrame")
+tabPanel.Name = "Tabs"
+tabPanel.Position = UDim2.new(1, -142, 0, 0)
+tabPanel.Size = UDim2.new(0, 132, 1, 0)
+tabPanel.BackgroundColor3 = Color3.fromRGB(28, 31, 39)
+tabPanel.BorderSizePixel = 0
+tabPanel.ScrollBarThickness = 4
+tabPanel.CanvasSize = UDim2.new(0, 0, 0, 0)
+tabPanel.AutomaticCanvasSize = Enum.AutomaticSize.Y
+tabPanel.ScrollingDirection = Enum.ScrollingDirection.Y
+tabPanel.Parent = body
+Instance.new("UICorner", tabPanel).CornerRadius = UDim.new(0, 9)
+
+local tabList = Instance.new("UIListLayout")
+tabList.Padding = UDim.new(0, 4)
+tabList.SortOrder = Enum.SortOrder.LayoutOrder
+tabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+tabList.Parent = tabPanel
+
+local tabPadding = Instance.new("UIPadding")
+tabPadding.PaddingTop = UDim.new(0, 6)
+tabPadding.PaddingLeft = UDim.new(0, 7)
+tabPadding.PaddingRight = UDim.new(0, 7)
+tabPadding.Parent = tabPanel
+
+local content = Instance.new("Frame")
+content.Name = "Content"
+content.Position = UDim2.new(0, 0, 0, 0)
+content.Size = UDim2.new(1, -150, 1, 0)
+content.BackgroundColor3 = Color3.fromRGB(28, 31, 39)
+content.BorderSizePixel = 0
+content.Parent = body
+Instance.new("UICorner", content).CornerRadius = UDim.new(0, 9)
+
+local contentTitle = Instance.new("TextLabel")
+contentTitle.Name = "ContentTitle"
+contentTitle.BackgroundTransparency = 1
+contentTitle.Position = UDim2.fromOffset(12, 8)
+contentTitle.Size = UDim2.new(1, -24, 0, 26)
+contentTitle.Font = Enum.Font.GothamBold
+contentTitle.Text = "Tổng quan"
+contentTitle.TextColor3 = Color3.fromRGB(240, 242, 248)
+contentTitle.TextSize = 16
+contentTitle.TextXAlignment = Enum.TextXAlignment.Left
+contentTitle.Parent = content
+
+local page = Instance.new("ScrollingFrame")
+page.Name = "Page"
+page.Position = UDim2.fromOffset(8, 40)
+page.Size = UDim2.new(1, -16, 1, -48)
+page.BackgroundTransparency = 1
+page.BorderSizePixel = 0
+page.ScrollBarThickness = 5
+page.CanvasSize = UDim2.new(0, 0, 0, 0)
+page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+page.ScrollingDirection = Enum.ScrollingDirection.Y
+page.Parent = content
+
+local pageLayout = Instance.new("UIListLayout")
+pageLayout.Padding = UDim.new(0, 7)
+pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+pageLayout.Parent = page
+
+local pagePadding = Instance.new("UIPadding")
+pagePadding.PaddingBottom = UDim.new(0, 8)
+pagePadding.PaddingLeft = UDim.new(0, 3)
+pagePadding.PaddingRight = UDim.new(0, 3)
+pagePadding.Parent = page
+
+local function clearPage()
+    for _, child in ipairs(page:GetChildren()) do
+        if child ~= pageLayout and child ~= pagePadding then
+            child:Destroy()
+        end
+    end
+end
+
+local function makeLabel(text, height)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -4, 0, height or 32)
+    label.BackgroundColor3 = Color3.fromRGB(38, 43, 54)
+    label.BorderSizePixel = 0
+    label.Font = Enum.Font.Gotham
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(220, 224, 234)
+    label.TextSize = 13
+    label.TextWrapped = true
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = page
+    Instance.new("UICorner", label).CornerRadius = UDim.new(0, 7)
+    local padding = Instance.new("UIPadding")
+    padding.PaddingLeft = UDim.new(0, 9)
+    padding.PaddingRight = UDim.new(0, 9)
+    padding.Parent = label
+    return label
+end
+
+local function makeActionButton(text, callback)
+    local button = makeButton(page, text, UDim2.new(1, -4, 0, 34), UDim2.new(0, 0, 0, 0))
+    button.Activated:Connect(callback)
+    return button
+end
+
+local function makeToggle(labelText, key)
+    local button
+    local function refresh()
+        button.Text = labelText .. ": " .. (state.toggles[key] and "BẬT" or "TẮT")
+        button.BackgroundColor3 = state.toggles[key]
+            and Color3.fromRGB(45, 104, 77) or Color3.fromRGB(48, 54, 68)
+    end
+    button = makeActionButton(labelText .. ": TẮT", function()
+        state.toggles[key] = not state.toggles[key]
+        refresh()
+    end)
+    refresh()
+    return button
+end
+
+local function makeSearchBox(placeholder, initial, onChanged)
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(1, -4, 0, 34)
+    box.BackgroundColor3 = Color3.fromRGB(38, 43, 54)
+    box.BorderSizePixel = 0
+    box.Font = Enum.Font.Gotham
+    box.PlaceholderText = placeholder
+    box.Text = initial or ""
+    box.TextColor3 = Color3.fromRGB(240, 242, 248)
+    box.PlaceholderColor3 = Color3.fromRGB(150, 156, 170)
+    box.TextSize = 13
+    box.ClearTextOnFocus = false
+    box.Parent = page
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 7)
+    box:GetPropertyChangedSignal("Text"):Connect(function()
+        onChanged(box.Text)
+    end)
+    return box
+end
+
+local function makeItemRow(itemName, isESP)
+    local collection = isESP and state.espItems or state.selectedItems
+    local button
+    local function refresh()
+        button.Text = (collection[itemName] and "☑  " or "□  ") .. itemName
+        button.BackgroundColor3 = collection[itemName]
+            and Color3.fromRGB(45, 90, 72) or Color3.fromRGB(38, 43, 54)
+    end
+    button = makeButton(page, itemName, UDim2.new(1, -4, 0, 31), UDim2.new(0, 0, 0, 0))
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Activated:Connect(function()
+        collection[itemName] = not collection[itemName]
+        refresh()
+    end)
+    refresh()
+end
+
+local function renderItems(isESP)
+    clearPage()
+    local collection = isESP and state.espItems or state.selectedItems
+    makeLabel(isESP and "Chọn món muốn đánh dấu ESP" or "Chọn vật phẩm cần ưu tiên", 32)
+    makeSearchBox("Tìm vật phẩm...", state.searchText, function(value)
+        state.searchText = value
+        -- Rebuild only the rows, not the search box, to avoid losing keyboard focus.
+        for _, child in ipairs(page:GetChildren()) do
+            if child:GetAttribute("ItemRow") then child:Destroy() end
+        end
+        local query = string.lower(value)
+        for _, name in ipairs(ITEMS) do
+            if query == "" or string.find(string.lower(name), query, 1, true) then
+                makeItemRow(name, isESP):SetAttribute("ItemRow", true)
+            end
+        end
+    end)
+    makeActionButton("Chọn tất cả", function()
+        for _, name in ipairs(ITEMS) do
+            if state.searchText == "" or string.find(string.lower(name), string.lower(state.searchText), 1, true) then
+                collection[name] = true
+            end
+        end
+        renderItems(isESP)
+    end)
+    makeActionButton("Bỏ chọn tất cả", function()
+        for _, name in ipairs(ITEMS) do collection[name] = false end
+        renderItems(isESP)
+    end)
+    local query = string.lower(state.searchText)
+    for _, name in ipairs(ITEMS) do
+        if query == "" or string.find(string.lower(name), query, 1, true) then
+            makeItemRow(name, isESP):SetAttribute("ItemRow", true)
+        end
+    end
+end
+
+local function renderTab(tabName)
+    state.activeTab = tabName
+    contentTitle.Text = tabName
+    clearPage()
+
+    if tabName == "Tổng quan" then
+        makeLabel("Dead Rails Ultimate Hub • Android", 32)
+        makeLabel("Đây là giao diện cấu hình. Các nút chưa tự can thiệp vào cơ chế máy chủ của game.", 48)
+        makeLabel("Chọn tab bên phải để mở chức năng.", 32)
+        makeLabel("Lựa chọn ESP: " .. tostring((function()
+            local n = 0
+            for _, value in pairs(state.espItems) do if value then n = n + 1 end end
+            return n
+        end)()) .. " món", 30)
+        makeLabel("Vật phẩm ưu tiên: " .. tostring((function()
+            local n = 0
+            for _, value in pairs(state.selectedItems) do if value then n = n + 1 end end
+            return n
+        end)()) .. " món", 30)
+
+    elseif tabName == "Auto Loot" then
+        makeToggle("Auto Loot (cấu hình)", "autoLoot")
+        makeLabel("Chưa kết nối cơ chế nhặt đồ thật; cần xác minh cách game hỗ trợ nhặt vật phẩm.", 48)
+        makeActionButton("Mở danh sách vật phẩm", function() renderTab("Danh sách item") end)
+
+    elseif tabName == "Danh sách item" then
+        renderItems(false)
+
+    elseif tabName == "ESP vật phẩm" then
+        makeToggle("ESP tổng (cấu hình)", "esp")
+        makeLabel("Danh sách dưới đây lưu lựa chọn ESP. Việc vẽ nhãn thật cần nhận diện vật phẩm hợp lệ.", 48)
+        -- renderItems clears page, so add the general toggle again inside its page.
+        renderItems(true)
+
+    elseif tabName == "Auto Climb" then
+        makeToggle("Auto Climb (cấu hình)", "autoClimb")
+        makeLabel("Chưa điều khiển nhân vật tự động. Cần cơ chế leo hợp lệ và kiểm tra vật cản.", 48)
+
+    elseif tabName == "Zombie Mode" then
+        makeToggle("Zombie Mode (cấu hình)", "zombieMode")
+        makeLabel("Giao diện trạng thái né zombie; chưa dò hay điều khiển NPC trong game.", 48)
+
+    elseif tabName == "Zombie Freeze" then
+        makeToggle("Zombie Freeze (cấu hình)", "zombieFreeze")
+        makeLabel("Chỉ là công tắc cấu hình. Không đóng băng NPC hoặc thay đổi vật lý nhân vật từ client.", 48)
+
+    elseif tabName == "Aura Kill" then
+        makeToggle("Aura Kill (cấu hình)", "auraKill")
+        makeLabel("Chưa gửi sát thương. Chỉ triển khai trong trải nghiệm mày sở hữu/được phép sửa và qua cơ chế chiến đấu hợp lệ.", 60)
+
+    elseif tabName == "Zombie Head Lock" then
+        makeToggle("Zombie Head Lock (cấu hình)", "headLock")
+        makeLabel("Chưa khóa camera hay tự ngắm. Nhận diện mục tiêu cần xác minh và phải tránh khóa nhầm người chơi.", 52)
+
+    elseif tabName == "Auto Attack" then
+        makeToggle("Auto Attack (cấu hình)", "autoAttack")
+        makeLabel("Chọn mức mong muốn. Đây chỉ là lựa chọn UI, không tăng tốc đánh thật.", 38)
+        for _, rate in ipairs({30, 40, 50}) do
+            local button = makeActionButton("Tốc độ đánh " .. rate .. (state.attackRate == rate and "  ✓" or ""), function()
+                state.attackRate = rate
+                renderTab("Auto Attack")
+            end)
+            if state.attackRate == rate then button.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Mức đang chọn: " .. state.attackRate, 30)
+
+    elseif tabName == "Auto Heal" then
+        makeToggle("Auto Heal bằng Snake Oil (cấu hình)", "autoHeal")
+        makeLabel("Ngưỡng máu: " .. state.healThreshold .. "%", 30)
+        for _, threshold in ipairs({20, 30, 40, 50, 60}) do
+            local button = makeActionButton("Hồi khi máu dưới " .. threshold .. "%" .. (state.healThreshold == threshold and "  ✓" or ""), function()
+                state.healThreshold = threshold
+                renderTab("Auto Heal")
+            end)
+            if state.healThreshold == threshold then button.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Snake Oil chưa được tự sử dụng. Cần xác minh cách dùng vật phẩm và lượng máu trong game.", 52)
+
+    elseif tabName == "Cài đặt" then
+        makeLabel("Chống lỗi giao diện", 30)
+        makeActionButton("Xóa lựa chọn ESP", function()
+            state.espItems = {}
+            renderTab("Cài đặt")
+        end)
+        makeActionButton("Xóa lựa chọn vật phẩm", function()
+            state.selectedItems = {}
+            renderTab("Cài đặt")
+        end)
+        makeActionButton("Đặt lại trạng thái các công tắc", function()
+            for key in pairs(state.toggles) do state.toggles[key] = false end
+            renderTab("Cài đặt")
+        end)
+        makeLabel("Đóng menu sẽ xóa GUI và các kết nối thuộc giao diện.", 42)
+    end
+end
+
+local tabs = {
+    "Tổng quan",
+    "Auto Loot",
+    "Danh sách item",
+    "ESP vật phẩm",
+    "Auto Climb",
+    "Zombie Mode",
+    "Zombie Freeze",
+    "Aura Kill",
+    "Zombie Head Lock",
+    "Auto Attack",
+    "Auto Heal",
+    "Cài đặt",
+}
+
+for index, tabName in ipairs(tabs) do
+    local button = makeButton(tabPanel, tabName, UDim2.new(1, 0, 0, 27), UDim2.new(0, 0, 0, 0))
+    button.LayoutOrder = index
+    button.TextSize = 11
+    button.Activated:Connect(function()
+        renderTab(tabName)
+    end)
+end
+
+renderTab("Tổng quan")
+
+-- Disconnect this global input listener when the GUI is removed.
+local dragConnection
+dragConnection = UserInputService.InputChanged:Connect(function()
+    if not gui.Parent and dragConnection then
+        dragConnection:Disconnect()
+    end
+end)
+
+gui.Destroying:Connect(function()
+    if dragConnection then
+        dragConnection:Disconnect()
+    end
+end)
