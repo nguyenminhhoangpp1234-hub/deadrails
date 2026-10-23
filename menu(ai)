@@ -1,5 +1,6 @@
+
 --[[
-DEAD RAILS ULTIMATE HUB - ANDROID UI BASE
+DEAD RAILS ULTIMATE HUB - ANDROID UI / AIM / ESP CONFIG
 Purpose: touch-friendly UI, item selection, settings and status indicators.
 Important: This file is a UI/configuration base. It does NOT implement game exploits,
 server-side pickup, damage, zombie freezing, aim-lock, or automatic item use.
@@ -39,20 +40,26 @@ local state = {
     searchText = "",
     selectedItems = {},
     espItems = {},
+    aimEnabled = false,
+    aimTarget = "Tất cả kẻ địch",
+    aimPart = "Đầu",
+    espSize = 14,
+    espDistance = 250,
+    espColor = "Cyan",
 }
 
 local ITEMS = {
-    "Coal", "Bandage", "Snake Oil", "Lantern", "Torch", "Camera",
-    "Banjo", "Gold Bar", "Gold Nugget", "Gold Watch", "Silver Bar",
-    "Silver Nugget", "Silver Watch", "Bonds", "Gold Statue",
-    "Gold Painting", "Gold Cup", "Gold Plate", "Silver Statue",
-    "Silver Painting", "Silver Cup", "Silver Plate", "Crucifix",
-    "Jade Tablet", "Brain In Jar", "Strange Map", "Strange Machine",
-    "Supply Depot Key", "Skeleton Key", "Lincoln's Top Hat",
-    "Barrel", "Chair", "Rope", "Wheel", "Book", "Newspaper",
-    "Vase", "Teapot", "Money", "Water", "Kerosene", "Milk",
-    "Blood", "Zombie Blood", "Unicorn Blood", "Angel Tears",
-    "Devil Tears", "Primordial Soup", "Cerebrus Blood", "Acid"
+    "Than đá", "Băng cứu thương", "Dầu rắn", "Đèn lồng", "Đuốc", "Máy ảnh",
+    "Đàn banjo", "Thỏi vàng", "Vàng cốm", "Đồng hồ vàng", "Thỏi bạc",
+    "Bạc cốm", "Đồng hồ bạc", "Trái phiếu", "Tượng vàng",
+    "Tranh vàng", "Cốc vàng", "Đĩa vàng", "Tượng bạc",
+    "Tranh bạc", "Cốc bạc", "Đĩa bạc", "Thánh giá",
+    "Phiến ngọc bích", "Não trong lọ", "Bản đồ lạ", "Cỗ máy lạ",
+    "Chìa khóa kho tiếp tế", "Chìa khóa xương", "Mũ Lincoln",
+    "Thùng", "Ghế", "Dây thừng", "Bánh xe", "Sách", "Báo",
+    "Bình hoa", "Ấm trà", "Tiền", "Nước", "Dầu hỏa", "Sữa",
+    "Máu", "Máu zombie", "Máu kỳ lân", "Nước mắt thiên thần",
+    "Nước mắt ác quỷ", "Súp nguyên thủy", "Máu Cerberus", "Axit"
 }
 
 local gui = Instance.new("ScreenGui")
@@ -64,8 +71,9 @@ gui.Parent = playerGui
 
 local main = Instance.new("Frame")
 main.Name = "Main"
-main.Size = UDim2.fromOffset(590, 390)
-main.Position = UDim2.new(0.5, -295, 0.5, -195)
+main.Size = UDim2.new(0.94, 0, 0.78, 0)
+main.Position = UDim2.new(0.03, 0, 0.11, 0)
+main.ClipsDescendants = true
 main.BackgroundColor3 = Color3.fromRGB(22, 24, 30)
 main.BorderSizePixel = 0
 main.Active = true
@@ -130,6 +138,76 @@ end
 local minimizeButton = makeButton(header, "−", UDim2.fromOffset(34, 28), UDim2.new(1, -76, 0, 7))
 local closeButton = makeButton(header, "×", UDim2.fromOffset(30, 28), UDim2.new(1, -38, 0, 7))
 closeButton.BackgroundColor3 = Color3.fromRGB(120, 48, 54)
+
+-- Basic local UI key gate (not secure; the key is visible in this script).
+local HUB_KEY = "NHUT123"
+main.Visible = false
+local keyPanel = Instance.new("Frame")
+keyPanel.Name = "KeyPanel"
+keyPanel.Size = UDim2.new(0.86, 0, 0, 190)
+keyPanel.Position = UDim2.new(0.07, 0, 0.5, -95)
+keyPanel.BackgroundColor3 = Color3.fromRGB(22, 24, 30)
+keyPanel.BorderSizePixel = 0
+keyPanel.Parent = gui
+Instance.new("UICorner", keyPanel).CornerRadius = UDim.new(0, 12)
+local keyTitle = Instance.new("TextLabel")
+keyTitle.Size = UDim2.new(1, -20, 0, 38)
+keyTitle.Position = UDim2.fromOffset(10, 10)
+keyTitle.BackgroundTransparency = 1
+keyTitle.Text = "DEAD RAILS HUB • NHẬP KEY"
+keyTitle.TextColor3 = Color3.fromRGB(240, 242, 248)
+keyTitle.Font = Enum.Font.GothamBold
+keyTitle.TextSize = 15
+keyTitle.Parent = keyPanel
+local keyBox = Instance.new("TextBox")
+keyBox.Size = UDim2.new(1, -28, 0, 38)
+keyBox.Position = UDim2.fromOffset(14, 58)
+keyBox.BackgroundColor3 = Color3.fromRGB(38, 43, 54)
+keyBox.BorderSizePixel = 0
+keyBox.PlaceholderText = "Nhập key..."
+keyBox.Text = ""
+keyBox.ClearTextOnFocus = false
+keyBox.TextColor3 = Color3.fromRGB(240, 242, 248)
+keyBox.PlaceholderColor3 = Color3.fromRGB(150, 156, 170)
+keyBox.Font = Enum.Font.Gotham
+keyBox.TextSize = 14
+keyBox.Parent = keyPanel
+Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 7)
+local keyButton = Instance.new("TextButton")
+keyButton.Size = UDim2.new(1, -28, 0, 36)
+keyButton.Position = UDim2.fromOffset(14, 108)
+keyButton.BackgroundColor3 = Color3.fromRGB(35, 105, 82)
+keyButton.BorderSizePixel = 0
+keyButton.Text = "MỞ MENU"
+keyButton.TextColor3 = Color3.new(1, 1, 1)
+keyButton.Font = Enum.Font.GothamBold
+keyButton.TextSize = 14
+keyButton.Parent = keyPanel
+Instance.new("UICorner", keyButton).CornerRadius = UDim.new(0, 7)
+local keyStatus = Instance.new("TextLabel")
+keyStatus.Size = UDim2.new(1, -20, 0, 24)
+keyStatus.Position = UDim2.fromOffset(10, 151)
+keyStatus.BackgroundTransparency = 1
+keyStatus.Text = "Key mặc định được đặt trong script."
+keyStatus.TextColor3 = Color3.fromRGB(175, 185, 200)
+keyStatus.Font = Enum.Font.Gotham
+keyStatus.TextSize = 11
+keyStatus.Parent = keyPanel
+local function submitKey()
+    if keyBox.Text == HUB_KEY then
+        keyPanel:Destroy()
+        main.Visible = true
+    else
+        keyStatus.Text = "Key không đúng, thử lại nha."
+        keyStatus.TextColor3 = Color3.fromRGB(255, 120, 120)
+        keyBox.Text = ""
+    end
+end
+keyButton.Activated:Connect(submitKey)
+
+keyBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then submitKey() end
+end)
 
 local expandedSize = main.Size
 local minimized = false
@@ -314,26 +392,6 @@ local function makeToggle(labelText, key)
     return button
 end
 
-local function makeSearchBox(placeholder, initial, onChanged)
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -4, 0, 34)
-    box.BackgroundColor3 = Color3.fromRGB(38, 43, 54)
-    box.BorderSizePixel = 0
-    box.Font = Enum.Font.Gotham
-    box.PlaceholderText = placeholder
-    box.Text = initial or ""
-    box.TextColor3 = Color3.fromRGB(240, 242, 248)
-    box.PlaceholderColor3 = Color3.fromRGB(150, 156, 170)
-    box.TextSize = 13
-    box.ClearTextOnFocus = false
-    box.Parent = page
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 7)
-    box:GetPropertyChangedSignal("Text"):Connect(function()
-        onChanged(box.Text)
-    end)
-    return box
-end
-
 local function makeItemRow(itemName, isESP)
     local collection = isESP and state.espItems or state.selectedItems
     local button
@@ -352,39 +410,20 @@ local function makeItemRow(itemName, isESP)
 end
 
 local function renderItems(isESP)
+
     clearPage()
     local collection = isESP and state.espItems or state.selectedItems
     makeLabel(isESP and "Chọn món muốn đánh dấu ESP" or "Chọn vật phẩm cần ưu tiên", 32)
-    makeSearchBox("Tìm vật phẩm...", state.searchText, function(value)
-        state.searchText = value
-        -- Rebuild only the rows, not the search box, to avoid losing keyboard focus.
-        for _, child in ipairs(page:GetChildren()) do
-            if child:GetAttribute("ItemRow") then child:Destroy() end
-        end
-        local query = string.lower(value)
-        for _, name in ipairs(ITEMS) do
-            if query == "" or string.find(string.lower(name), query, 1, true) then
-                makeItemRow(name, isESP):SetAttribute("ItemRow", true)
-            end
-        end
-    end)
     makeActionButton("Chọn tất cả", function()
-        for _, name in ipairs(ITEMS) do
-            if state.searchText == "" or string.find(string.lower(name), string.lower(state.searchText), 1, true) then
-                collection[name] = true
-            end
-        end
+        for _, name in ipairs(ITEMS) do collection[name] = true end
         renderItems(isESP)
     end)
     makeActionButton("Bỏ chọn tất cả", function()
         for _, name in ipairs(ITEMS) do collection[name] = false end
         renderItems(isESP)
     end)
-    local query = string.lower(state.searchText)
     for _, name in ipairs(ITEMS) do
-        if query == "" or string.find(string.lower(name), query, 1, true) then
-            makeItemRow(name, isESP):SetAttribute("ItemRow", true)
-        end
+        makeItemRow(name, isESP):SetAttribute("ItemRow", true)
     end
 end
 
@@ -421,6 +460,59 @@ local function renderTab(tabName)
         makeLabel("Danh sách dưới đây lưu lựa chọn ESP. Việc vẽ nhãn thật cần nhận diện vật phẩm hợp lệ.", 48)
         -- renderItems clears page, so add the general toggle again inside its page.
         renderItems(true)
+
+    elseif tabName == "AIM mục tiêu" then
+        makeLabel("CẤU HÌNH AIM • chỉ lưu lựa chọn giao diện", 34)
+        local aimButton = makeActionButton("Ghim mục tiêu: " .. (state.aimEnabled and "BẬT" or "TẮT"), function()
+            state.aimEnabled = not state.aimEnabled
+            renderTab("AIM mục tiêu")
+        end)
+        aimButton.BackgroundColor3 = state.aimEnabled and Color3.fromRGB(45, 104, 77) or Color3.fromRGB(48, 54, 68)
+        makeLabel("Loại mục tiêu", 28)
+        for _, targetName in ipairs({"Zombie", "Quái vật khác zombie", "Tất cả kẻ địch"}) do
+            local b = makeActionButton((state.aimTarget == targetName and "✓  " or "○  ") .. targetName, function()
+                state.aimTarget = targetName
+                renderTab("AIM mục tiêu")
+            end)
+            if state.aimTarget == targetName then b.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Vị trí ghim", 28)
+        for _, partName in ipairs({"Đầu", "Thân"}) do
+            local b = makeActionButton((state.aimPart == partName and "✓  " or "○  ") .. partName, function()
+                state.aimPart = partName
+                renderTab("AIM mục tiêu")
+            end)
+            if state.aimPart == partName then b.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Lưu ý: đây là cài đặt giao diện; chưa tự khóa camera hoặc tác động vào game.", 48)
+
+    elseif tabName == "ESP cài đặt" then
+        makeToggle("ESP mục tiêu (cấu hình)", "esp")
+        makeLabel("Kích thước đánh dấu: " .. state.espSize .. " px", 30)
+        for _, n in ipairs({8, 14, 20, 28, 32}) do
+            local b = makeActionButton((state.espSize == n and "✓  " or "") .. "Kích thước " .. n, function()
+                state.espSize = n
+                renderTab("ESP cài đặt")
+            end)
+            if state.espSize == n then b.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Khoảng cách hiển thị: " .. state.espDistance .. " studs", 30)
+        for _, n in ipairs({100, 250, 500, 1000}) do
+            local b = makeActionButton((state.espDistance == n and "✓  " or "") .. n .. " studs", function()
+                state.espDistance = n
+                renderTab("ESP cài đặt")
+            end)
+            if state.espDistance == n then b.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Màu đánh dấu: " .. state.espColor, 30)
+        for _, colorName in ipairs({"Cyan", "Đỏ", "Vàng", "Xanh lá"}) do
+            local b = makeActionButton((state.espColor == colorName and "✓  " or "") .. colorName, function()
+                state.espColor = colorName
+                renderTab("ESP cài đặt")
+            end)
+            if state.espColor == colorName then b.BackgroundColor3 = Color3.fromRGB(45, 90, 72) end
+        end
+        makeLabel("Các mục trên lưu cấu hình; việc vẽ ESP thật cần bộ nhận diện hợp lệ.", 48)
 
     elseif tabName == "Auto Climb" then
         makeToggle("Auto Climb (cấu hình)", "autoClimb")
@@ -489,6 +581,8 @@ local tabs = {
     "Auto Loot",
     "Danh sách item",
     "ESP vật phẩm",
+    "AIM mục tiêu",
+    "ESP cài đặt",
     "Auto Climb",
     "Zombie Mode",
     "Zombie Freeze",
